@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Converge Agent Portal</title>
+
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+
+</head>
+
+<body class="bg-gray-100">
+
+<!-- HEADER -->
+
+<header class="bg-blue-600 text-white p-4">
+<h1 class="text-2xl font-bold">Converge Sales Agent Portal</h1>
+</header>
+
+<!-- NAV -->
+
+<div class="flex flex-wrap bg-white shadow p-2 gap-2">
+
+<button onclick="showPage('coverage')" class="bg-blue-500 text-white px-3 py-2 rounded">Coverage</button>
+
+<button onclick="showPage('plans')" class="bg-blue-500 text-white px-3 py-2 rounded">Plans</button>
+
+<button onclick="showPage('tracker')" class="bg-blue-500 text-white px-3 py-2 rounded">Tracker</button>
+
+<button onclick="showPage('promo')" class="bg-blue-500 text-white px-3 py-2 rounded">Promo Generator</button>
+
+<button onclick="showPage('agent')" class="bg-blue-500 text-white px-3 py-2 rounded">Agent Page</button>
+
+<button onclick="showPage('dashboard')" class="bg-blue-500 text-white px-3 py-2 rounded">Dashboard</button>
+
+</div>
+
+<!-- COVERAGE CHECKER -->
+
+<div id="coverage" class="p-4">
+
+<h2 class="text-xl font-bold mb-3">Coverage Checker</h2>
+
+<div id="map" style="height:300px;"></div>
+
+<input id="name" placeholder="Full Name" class="border p-2 w-full mt-3">
+<input id="phone" placeholder="Phone" class="border p-2 w-full mt-2">
+<input id="address" placeholder="Address" class="border p-2 w-full mt-2">
+
+<select id="plan" class="border p-2 w-full mt-2">
+<option>FiberX 1500</option>
+<option>FiberX 2500</option>
+<option>FiberX 3500</option>
+</select>
+
+<button onclick="submitLead()" class="bg-green-500 text-white p-2 mt-3 rounded">
+Apply Now
+</button>
+
+</div>
+
+<!-- PLAN COMPARISON -->
+
+<div id="plans" class="p-4 hidden">
+
+<h2 class="text-xl font-bold mb-4">Plan Comparison</h2>
+
+<table class="w-full bg-white shadow">
+
+<tr class="bg-gray-200">
+<th class="p-2">Plan</th>
+<th class="p-2">Speed</th>
+<th class="p-2">Price</th>
+<th class="p-2">Best For</th>
+</tr>
+
+<tr>
+<td class="p-2">FiberX 1500</td>
+<td class="p-2">200 Mbps</td>
+<td class="p-2">₱1500</td>
+<td class="p-2">Streaming</td>
+</tr>
+
+<tr>
+<td class="p-2">FiberX 2500</td>
+<td class="p-2">400 Mbps</td>
+<td class="p-2">₱2500</td>
+<td class="p-2">Gaming</td>
+</tr>
+
+<tr>
+<td class="p-2">FiberX 3500</td>
+<td class="p-2">800 Mbps</td>
+<td class="p-2">₱3500</td>
+<td class="p-2">Business</td>
+</tr>
+
+</table>
+
+</div>
+
+<!-- INSTALLATION TRACKER -->
+
+<div id="tracker" class="p-4 hidden">
+
+<h2 class="text-xl font-bold mb-3">Installation Tracker</h2>
+
+<input id="trackPhone" placeholder="Enter phone number"
+class="border p-2 w-full">
+
+<button onclick="track()" class="bg-blue-500 text-white p-2 mt-2 rounded">
+Track
+</button>
+
+<div id="trackResult" class="mt-4"></div>
+
+</div>
+
+<!-- PROMO GENERATOR -->
+
+<div id="promo" class="p-4 hidden">
+
+<h2 class="text-xl font-bold mb-3">Promo Generator</h2>
+
+<input id="agentName" placeholder="Agent Name"
+class="border p-2 w-full">
+
+<input id="agentPhone" placeholder="Phone"
+class="border p-2 w-full mt-2">
+
+<button onclick="generatePromo()" class="bg-purple-500 text-white p-2 mt-2 rounded">
+Generate Poster
+</button>
+
+<canvas id="poster" width="400" height="400" class="mt-4 border"></canvas>
+
+</div>
+
+<!-- AGENT PAGE + QR -->
+
+<div id="agent" class="p-4 hidden">
+
+<h2 class="text-xl font-bold mb-3">Agent QR Page</h2>
+
+<input id="agentLink" placeholder="Agent username"
+class="border p-2 w-full">
+
+<button onclick="generateQR()" class="bg-green-500 text-white p-2 mt-2 rounded">
+Generate QR
+</button>
+
+<div id="qrcode" class="mt-4"></div>
+
+</div>
+
+<!-- DASHBOARD -->
+
+<div id="dashboard" class="p-4 hidden">
+
+<h2 class="text-xl font-bold mb-3">Sales Dashboard</h2>
+
+<div class="grid grid-cols-2 gap-4">
+
+<div class="bg-white p-4 shadow">
+<h3>Total Leads</h3>
+<p id="leadCount" class="text-2xl font-bold">0</p>
+</div>
+
+<div class="bg-white p-4 shadow">
+<h3>Installed</h3>
+<p id="installCount" class="text-2xl font-bold">0</p>
+</div>
+
+</div>
+
+<h3 class="mt-6 font-bold">Lead List</h3>
+
+<div id="leadList"></div>
+
+</div>
+
+<script src="app.js"></script>
+
+</body>
+</html>
