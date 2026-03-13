@@ -14,8 +14,6 @@ margin:0;
 background:#f4f6fb;
 }
 
-/* LOGIN */
-
 .login{
 width:320px;
 margin:120px auto;
@@ -33,18 +31,20 @@ border-radius:6px;
 border:1px solid #ddd;
 }
 
-/* BUTTON */
-
 button{
-padding:8px 12px;
+padding:6px 8px;
 background:#4a6cf7;
 color:white;
 border:none;
-border-radius:6px;
+border-radius:4px;
 cursor:pointer;
+font-size:12px;
 }
 
-/* DASHBOARD */
+.smallbtn{
+padding:4px 6px;
+font-size:11px;
+}
 
 .dashboard{
 display:none;
@@ -74,8 +74,6 @@ padding:30px;
 display:none;
 }
 
-/* CARDS */
-
 .cards{
 display:flex;
 gap:20px;
@@ -94,8 +92,6 @@ border-radius:10px;
 .c3{background:#42e695;}
 .c4{background:#ff9966;}
 
-/* FORM */
-
 input,select{
 width:100%;
 padding:10px;
@@ -103,8 +99,6 @@ margin:6px 0;
 border-radius:6px;
 border:1px solid #ddd;
 }
-
-/* TABLE */
 
 table{
 width:100%;
@@ -121,8 +115,6 @@ border-bottom:1px solid #eee;
 background:red;
 }
 
-/* MAP */
-
 #map{
 height:450px;
 }
@@ -132,8 +124,6 @@ height:450px;
 </head>
 
 <body>
-
-<!-- LOGIN -->
 
 <div class="login" id="login">
 
@@ -145,8 +135,6 @@ height:450px;
 <button onclick="login()">Login</button>
 
 </div>
-
-<!-- DASHBOARD -->
 
 <div class="dashboard" id="dashboard">
 
@@ -161,8 +149,6 @@ height:450px;
 </div>
 
 <div class="main">
-
-<!-- DASHBOARD -->
 
 <div id="dash" class="section">
 
@@ -179,8 +165,6 @@ height:450px;
 
 </div>
 
-<!-- SUBSCRIBERS -->
-
 <div id="subs" class="section">
 
 <h2>Add Subscriber</h2>
@@ -195,36 +179,30 @@ height:450px;
 
 <select id="plan">
 
-<!-- SUPER FIBER -->
 <option value="1349">Super FiberX Play 1349</option>
 <option value="1599">Super FiberX Max 1599</option>
 <option value="2599">Super FiberX Ultra 2599</option>
 
-<!-- FIBERX -->
 <option value="1500">FiberX 1500</option>
 <option value="2000">FiberX 2000</option>
 <option value="2500">FiberX 2500</option>
 <option value="3500">FiberX 3500</option>
 <option value="7000">FiberX 7000</option>
 
-<!-- BUNDLES -->
 <option value="1700">FiberX 1500 + Vision</option>
 <option value="2200">FiberX 2000 + Vision</option>
 <option value="2700">FiberX 2500 + Vision</option>
 
-<!-- TOD -->
 <option value="1699">TOD 1699</option>
 <option value="1999">TOD 1999</option>
 <option value="3000">TOD 3000</option>
 <option value="3500">TOD 3500</option>
 
-<!-- FLEXIBIZ -->
 <option value="1500">FlexiBIZ 1500</option>
 <option value="2000">FlexiBIZ 2000</option>
 <option value="3000">FlexiBIZ 3000</option>
 <option value="5000">FlexiBIZ 5000</option>
 
-<!-- MICROBIZ -->
 <option value="1449">MicroBIZ MAX 1449</option>
 <option value="1549">MicroBIZ MAX 1549</option>
 <option value="1749">MicroBIZ MAX 1749</option>
@@ -244,17 +222,15 @@ height:450px;
 <table>
 
 <thead>
-
 <tr>
 <th>Name</th>
 <th>Phone</th>
 <th>Code</th>
 <th>Plan</th>
 <th>Status</th>
-<th>Next</th>
+<th>→</th>
 <th>Delete</th>
 </tr>
-
 </thead>
 
 <tbody id="table"></tbody>
@@ -262,8 +238,6 @@ height:450px;
 </table>
 
 </div>
-
-<!-- MAP -->
 
 <div id="mapsec" class="section">
 
@@ -284,15 +258,14 @@ let subscribers=[]
 let stages=[
 "Applied",
 "OMD",
-"Pending/Approved",
+"Pending",
+"Approved",
 "For Installation",
 "Installed"
 ]
 
 let map
 let markers=[]
-
-/* LOGIN */
 
 function login(){
 
@@ -314,8 +287,6 @@ alert("Wrong login")
 
 }
 
-/* SECTIONS */
-
 function showSection(id){
 
 document.querySelectorAll(".section").forEach(s=>{
@@ -325,14 +296,10 @@ s.style.display="none"
 document.getElementById(id).style.display="block"
 
 if(id==="mapsec" && !map){
-
 loadMap()
-
 }
 
 }
-
-/* FAST MAP LOAD */
 
 function loadMap(){
 
@@ -354,8 +321,6 @@ render()
 document.body.appendChild(script)
 
 }
-
-/* ADD SUBSCRIBER */
 
 function add(){
 
@@ -380,36 +345,26 @@ render()
 
 }
 
-/* NEXT STEP */
-
 function nextStep(i){
 
 if(subscribers[i].status<stages.length-1){
-
 subscribers[i].status++
-
 }
 
 render()
 
 }
-
-/* DELETE */
 
 function deleteRow(i){
 
 subscribers.splice(i,1)
-
 render()
 
 }
 
-/* RENDER */
-
 function render(){
 
 let table=document.getElementById("table")
-
 table.innerHTML=""
 
 let searchText=document.getElementById("search").value.toLowerCase()
@@ -430,7 +385,6 @@ s.code.toLowerCase().includes(searchText)
 ){
 
 let stage=stages[s.status]
-
 let commission=(s.plan/2)-50
 
 if(stage==="Installed"){
@@ -448,15 +402,14 @@ table.innerHTML+=`
 <td>${s.code}</td>
 <td>₱${s.plan}</td>
 <td>${stage}</td>
-<td><button onclick="nextStep(${i})">Next</button></td>
-<td><button class="delete" onclick="deleteRow(${i})">Delete</button></td>
+<td><button class="smallbtn" onclick="nextStep(${i})">→</button></td>
+<td><button class="delete smallbtn" onclick="deleteRow(${i})">✕</button></td>
 </tr>
 `
 
 if(map && s.lat && s.lng){
 
 let marker=L.marker([s.lat,s.lng]).addTo(map)
-
 marker.bindPopup(s.name)
 
 markers.push(marker)
@@ -474,8 +427,6 @@ document.getElementById("commission").innerText=totalCommission
 
 }
 
-/* EXPORT */
-
 function exportCSV(){
 
 let csv="Name,Phone,Code,Plan\n"
@@ -489,9 +440,7 @@ let blob=new Blob([csv])
 let a=document.createElement("a")
 
 a.href=URL.createObjectURL(blob)
-
 a.download="subscribers.csv"
-
 a.click()
 
 }
