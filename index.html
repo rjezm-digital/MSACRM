@@ -14,6 +14,8 @@ margin:0;
 background:#eef1f7;
 }
 
+/* LOGIN */
+
 .login{
 width:320px;
 margin:120px auto;
@@ -30,6 +32,8 @@ margin:10px 0;
 border-radius:6px;
 border:1px solid #ddd;
 }
+
+/* SIDEBAR */
 
 .sidebar{
 width:230px;
@@ -51,6 +55,10 @@ border-radius:6px;
 cursor:pointer;
 }
 
+.sidebar button:hover{
+background:#4a6cf7;
+}
+
 .main{
 margin-left:250px;
 padding:30px;
@@ -59,6 +67,8 @@ padding:30px;
 .section{
 display:none;
 }
+
+/* CARDS */
 
 .cards{
 display:grid;
@@ -87,6 +97,8 @@ margin:6px 0;
 border-radius:6px;
 border:1px solid #ddd;
 }
+
+/* TABLE */
 
 table{
 width:100%;
@@ -122,6 +134,10 @@ padding:4px 6px;
 background:red;
 color:white;
 border:none;
+}
+
+#map{
+height:450px;
 }
 
 </style>
@@ -161,6 +177,7 @@ admin / admin123
 
 <button onclick="showSection('dash')">Monitoring</button>
 <button onclick="showSection('subs')">Subscribers</button>
+<button onclick="showSection('mapsec')">Map</button>
 
 </div>
 
@@ -181,6 +198,19 @@ admin / admin123
 
 </div>
 
+<h3>Agent Leaderboard</h3>
+
+<table>
+<thead>
+<tr>
+<th>Agent</th>
+<th>Installed</th>
+<th>Earnings</th>
+</tr>
+</thead>
+<tbody id="leaderboard"></tbody>
+</table>
+
 </div>
 
 <div id="subs" class="section">
@@ -190,6 +220,8 @@ admin / admin123
 <input id="name" placeholder="Subscriber Name">
 <input id="phone" placeholder="Phone Number">
 <input id="code" placeholder="Application Code">
+<input id="lat" placeholder="Latitude">
+<input id="lng" placeholder="Longitude">
 
 <select id="plan">
 
@@ -201,17 +233,27 @@ admin / admin123
 <option value="2000">FiberX 2000</option>
 <option value="2500">FiberX 2500</option>
 <option value="3500">FiberX 3500</option>
+<option value="7000">FiberX 7000</option>
 
 <option value="1700">FiberX 1500 + Vision</option>
 <option value="2200">FiberX 2000 + Vision</option>
+<option value="2700">FiberX 2500 + Vision</option>
 
 <option value="1699">TOD 1699</option>
 <option value="1999">TOD 1999</option>
+<option value="3000">TOD 3000</option>
+<option value="3500">TOD 3500</option>
 
 <option value="1500">FlexiBIZ 1500</option>
 <option value="2000">FlexiBIZ 2000</option>
+<option value="3000">FlexiBIZ 3000</option>
+<option value="5000">FlexiBIZ 5000</option>
 
 <option value="1449">MicroBIZ MAX 1449</option>
+<option value="1549">MicroBIZ MAX 1549</option>
+<option value="1749">MicroBIZ MAX 1749</option>
+<option value="2099">MicroBIZ MAX 2099</option>
+<option value="2449">MicroBIZ MAX 2449</option>
 
 </select>
 
@@ -239,9 +281,19 @@ admin / admin123
 
 </div>
 
+<div id="mapsec" class="section">
+
+<h2>Subscriber Map</h2>
+
+<div id="map"></div>
+
 </div>
 
 </div>
+
+</div>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
 <script>
 
@@ -282,13 +334,17 @@ if(users[u] && users[u]===p){
 currentUser=u
 isAdmin=(u==="admin")
 
-login.style.display="none"
-dashboard.style.display="block"
+document.getElementById("login").style.display="none"
+document.getElementById("dashboard").style.display="block"
 
 document.getElementById("panelTitle").innerText=isAdmin?"Admin Panel":"Agent Panel"
 
 showSection("dash")
 render()
+
+}else{
+
+alert("Invalid username or password")
 
 }
 
@@ -300,6 +356,8 @@ document.querySelectorAll(".section").forEach(s=>s.style.display="none")
 
 document.getElementById(id).style.display="block"
 
+if(id==="mapsec") loadMap()
+
 }
 
 function add(){
@@ -308,6 +366,8 @@ let name=document.getElementById("name").value
 let phone=document.getElementById("phone").value
 let code=document.getElementById("code").value
 let plan=document.getElementById("plan").value
+let lat=document.getElementById("lat").value
+let lng=document.getElementById("lng").value
 
 subscribers.push({
 agent:currentUser,
@@ -315,6 +375,8 @@ name,
 phone,
 code,
 plan,
+lat,
+lng,
 status:0,
 date:new Date()
 })
@@ -366,6 +428,8 @@ let installed=0
 let weekly=0
 let monthly=0
 
+let agents={}
+
 let now=new Date()
 
 subscribers.forEach((s,i)=>{
@@ -379,6 +443,11 @@ if(stage==="Installed"){
 
 installed++
 total+=commission
+
+if(!agents[s.agent]) agents[s.agent]={count:0,earn:0}
+
+agents[s.agent].count++
+agents[s.agent].earn+=commission
 
 let diff=(now-new Date(s.date))/86400000
 
@@ -408,12 +477,56 @@ table.innerHTML+=`
 
 })
 
+let board=document.getElementById("leaderboard")
+
+board.innerHTML=""
+
+Object.keys(agents).sort((a,b)=>agents[b].earn-agents[a].earn).forEach(a=>{
+
+board.innerHTML+=`
+
+<tr>
+<td>${a}</td>
+<td>${agents[a].count}</td>
+<td>₱${agents[a].earn}</td>
+</tr>
+
+`
+
+})
+
 document.getElementById("total").innerText=subscribers.length
 document.getElementById("pending").innerText=pending
 document.getElementById("installed").innerText=installed
 document.getElementById("commission").innerText=total
 document.getElementById("weekly").innerText=weekly
 document.getElementById("monthly").innerText=monthly
+
+}
+
+let map
+
+function loadMap(){
+
+if(map) return
+
+map=L.map('map').setView([9.65,124.02],11)
+
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map)
+
+subscribers.forEach(s=>{
+
+if(!isAdmin && s.agent!==currentUser) return
+
+if(s.lat && s.lng){
+
+L.marker([s.lat,s.lng])
+.addTo(map)
+.bindPopup(s.name+"<br>"+s.agent)
+
+}
+
+})
 
 }
 
