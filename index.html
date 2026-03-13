@@ -56,19 +56,12 @@ background:rgba(0,0,0,.6);
 display:flex;
 align-items:center;
 justify-content:center;
+z-index:9999;
 }
 
-.status{
-padding:4px 10px;
-border-radius:999px;
-font-size:12px;
+.leaflet-container{
+z-index:1;
 }
-
-.application{background:#334155}
-.omd{background:#92400e}
-.approved{background:#166534}
-.scheduled{background:#4338ca}
-.installed{background:#065f46}
 
 </style>
 
@@ -116,7 +109,6 @@ Applications
 
 <div class="flex-1 flex flex-col">
 
-
 <!-- HEADER -->
 
 <div class="flex justify-between items-center px-6 py-4 border-b border-slate-800 bg-slate-900">
@@ -152,11 +144,7 @@ Import
 
 <div class="p-6 space-y-6 overflow-auto">
 
-<!-- STATS -->
-
 <div id="dashboard" class="grid grid-cols-4 gap-4"></div>
-
-<!-- MAP -->
 
 <div id="mapSection" class="card">
 
@@ -166,8 +154,6 @@ Import
 
 </div>
 
-<!-- SALES CHART -->
-
 <div id="analytics" class="card">
 
 <h2 class="font-semibold mb-3">Plan Sales Chart</h2>
@@ -175,8 +161,6 @@ Import
 <canvas id="salesChart"></canvas>
 
 </div>
-
-<!-- TABLE -->
 
 <div id="tableSection" class="card">
 
@@ -298,7 +282,6 @@ const $=id=>document.getElementById(id)
 let records=JSON.parse(localStorage.getItem("crm"))||[]
 
 let map
-let markers=[]
 let chart
 
 function save(){
@@ -314,13 +297,10 @@ return parseInt(plan.match(/₱(\d+)/)[1])
 }
 
 function commission(plan){
-
 let p=price(plan)
-
 if(p<=1500)return 800
 if(p<=2500)return 1200
 return 2000
-
 }
 
 function renderStats(){
@@ -336,36 +316,6 @@ $("dashboard").innerHTML=`
 <div class="card"><p>Pending</p><h2>${records.length-installed}</h2></div>
 
 `
-
-}
-
-function renderChart(){
-
-let stats={}
-
-records.forEach(r=>{
-stats[r.plan]=(stats[r.plan]||0)+1
-})
-
-let labels=Object.keys(stats)
-let data=Object.values(stats)
-
-if(chart) chart.destroy()
-
-chart=new Chart(document.getElementById("salesChart"),{
-
-type:"bar",
-
-data:{
-labels:labels,
-datasets:[{
-label:"Plan Sales",
-data:data
-}]
-}
-
-})
-
 }
 
 function renderTable(){
@@ -397,62 +347,57 @@ $("table").appendChild(tr)
 })
 
 lucide.createIcons()
+}
 
+function renderChart(){
+
+let stats={}
+records.forEach(r=>{
+stats[r.plan]=(stats[r.plan]||0)+1
+})
+
+let labels=Object.keys(stats)
+let data=Object.values(stats)
+
+if(chart)chart.destroy()
+
+chart=new Chart(document.getElementById("salesChart"),{
+type:"bar",
+data:{labels:labels,datasets:[{label:"Plan Sales",data:data}]}
+})
 }
 
 function advance(i){
-
 const order=["Application","OMD","Approved","Scheduled","Installed"]
-
 let idx=order.indexOf(records[i].status)
-
-if(idx<order.length-1)
-records[i].status=order[idx+1]
-
+if(idx<order.length-1)records[i].status=order[idx+1]
 save()
-
 renderStats()
 renderTable()
 renderChart()
-
 }
 
 function delRec(i){
-
 records.splice(i,1)
-
 save()
-
 renderStats()
 renderTable()
 renderChart()
-
-}
-
-function initMap(){
-
-map=L.map('map').setView([10.3157,123.8854],12)
-
-L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map)
-
 }
 
 $("btn-add").onclick=()=>{$("modal").classList.remove("hidden")}
 $("cancel").onclick=()=>{$("modal").classList.add("hidden")}
 
 $("form").onsubmit=e=>{
-
 e.preventDefault()
 
 records.push({
-
 code:$("code").value,
 name:$("name").value,
 phone:$("phone").value,
 address:$("address").value,
 plan:$("plan").value,
 status:$("status").value
-
 })
 
 save()
@@ -462,7 +407,11 @@ $("modal").classList.add("hidden")
 renderStats()
 renderTable()
 renderChart()
+}
 
+function initMap(){
+map=L.map('map').setView([10.3157,123.8854],12)
+L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map)
 }
 
 renderStats()
