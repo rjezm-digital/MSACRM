@@ -6,7 +6,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Converge Agent Dashboard</title>
+<title>Converge Agent CRM</title>
 
 <script src="https://cdn.tailwindcss.com"></script>
 <script src="https://cdn.jsdelivr.net/npm/lucide@0.263.0/dist/umd/lucide.min.js"></script>
@@ -38,18 +38,15 @@ justify-content:center;
 
 </head>
 
-
-<body>
-
+<body class="flex flex-col min-h-screen">
 
 
 <header class="flex items-center justify-between px-6 py-4 bg-slate-800 border-b border-slate-700">
 
 <div class="flex items-center gap-4">
 
-<img 
-src="https://seeklogo.com/images/C/converge-ict-logo-7F4C8A2C1B-seeklogo.com.png"
-class="h-10">
+<img src="https://seeklogo.com/images/C/converge-ict-logo-7F4C8A2C1B-seeklogo.com.png" class="h-10">
+
 <div>
 <h1 class="font-display text-xl">Agent Dashboard</h1>
 <p class="text-sm text-slate-400">Converge Sales CRM</p>
@@ -58,17 +55,25 @@ class="h-10">
 </div>
 
 
-<div class="flex gap-3">
+<div class="flex gap-3 flex-wrap">
 
-<button id="btn-calendar"
-class="px-4 py-2 bg-slate-700 rounded-lg text-sm">
-Installation Calendar
+<button id="btn-calendar" class="px-3 py-2 bg-slate-700 rounded text-sm">
+Calendar
 </button>
 
+<button id="btn-export" class="px-3 py-2 bg-slate-700 rounded text-sm">
+Export
+</button>
+
+<label class="px-3 py-2 bg-slate-700 rounded text-sm cursor-pointer">
+Import
+<input type="file" id="importFile" hidden>
+</label>
+
 <button id="btn-add"
-class="px-4 py-2 bg-blue-500 rounded-lg text-sm flex gap-2 items-center">
+class="px-3 py-2 bg-blue-500 rounded text-sm flex gap-2 items-center">
 <i data-lucide="plus"></i>
-New Application
+New
 </button>
 
 </div>
@@ -77,33 +82,31 @@ New Application
 
 
 
-<main class="p-6">
+<main class="p-6 flex-1">
 
-
-<!-- STATS -->
 
 <div id="stats" class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6"></div>
 
 
-<!-- PLAN ANALYTICS -->
 
 <div class="bg-slate-800 border border-slate-700 rounded-xl p-4 mb-6">
 
-<h3 class="font-display mb-3">Plan Sales Analytics</h3>
+<h3 class="font-display mb-3">Plan Analytics</h3>
 
 <div id="planStats" class="grid grid-cols-2 md:grid-cols-4 gap-3"></div>
 
 </div>
 
 
-<div class="flex gap-3 mb-4">
+
+<div class="flex gap-3 mb-4 flex-wrap">
 
 <input id="search"
 placeholder="Search customer..."
-class="flex-1 px-4 py-2 bg-slate-800 border border-slate-700 rounded-lg">
+class="flex-1 px-4 py-2 bg-slate-800 border border-slate-700 rounded">
 
 <select id="filter"
-class="px-4 py-2 bg-slate-800 border border-slate-700 rounded-lg">
+class="px-4 py-2 bg-slate-800 border border-slate-700 rounded">
 
 <option value="all">All Status</option>
 <option>Application</option>
@@ -148,7 +151,15 @@ class="px-4 py-2 bg-slate-800 border border-slate-700 rounded-lg">
 
 
 
-<!-- MODAL -->
+<footer class="text-center text-sm text-slate-400 py-4 border-t border-slate-700 bg-slate-900">
+
+© 2026 Converge Agent CRM  
+<br>
+By Randy Tadlas
+
+</footer>
+
+
 
 <div id="modal" class="modal hidden">
 
@@ -158,25 +169,21 @@ class="px-4 py-2 bg-slate-800 border border-slate-700 rounded-lg">
 
 <form id="form" class="space-y-3">
 
-<input id="code"
-placeholder="Application Code"
-class="w-full px-4 py-2 bg-slate-900 border border-slate-700 rounded-lg">
+<input id="code" placeholder="Application Code"
+class="w-full px-4 py-2 bg-slate-900 border border-slate-700 rounded">
 
-<input id="name"
-placeholder="Customer Name"
-class="w-full px-4 py-2 bg-slate-900 border border-slate-700 rounded-lg">
+<input id="name" placeholder="Customer Name"
+class="w-full px-4 py-2 bg-slate-900 border border-slate-700 rounded">
 
-<input id="phone"
-placeholder="Phone Number"
-class="w-full px-4 py-2 bg-slate-900 border border-slate-700 rounded-lg">
+<input id="phone" placeholder="Phone Number"
+class="w-full px-4 py-2 bg-slate-900 border border-slate-700 rounded">
 
-<input id="address"
-placeholder="Address"
-class="w-full px-4 py-2 bg-slate-900 border border-slate-700 rounded-lg">
+<input id="address" placeholder="Address"
+class="w-full px-4 py-2 bg-slate-900 border border-slate-700 rounded">
 
 
 <select id="plan"
-class="w-full px-4 py-2 bg-slate-900 border border-slate-700 rounded-lg">
+class="w-full px-4 py-2 bg-slate-900 border border-slate-700 rounded">
 
 <option>FiberX 1500 — 300 Mbps — ₱1500</option>
 <option>FiberX 2000 — 500 Mbps — ₱2000</option>
@@ -198,7 +205,7 @@ class="w-full px-4 py-2 bg-slate-900 border border-slate-700 rounded-lg">
 
 
 <select id="status"
-class="w-full px-4 py-2 bg-slate-900 border border-slate-700 rounded-lg">
+class="w-full px-4 py-2 bg-slate-900 border border-slate-700 rounded">
 
 <option>Application</option>
 <option>OMD</option>
@@ -211,23 +218,22 @@ class="w-full px-4 py-2 bg-slate-900 border border-slate-700 rounded-lg">
 
 <label class="text-xs text-slate-400">Installation Date</label>
 <input type="date" id="install"
-class="w-full px-4 py-2 bg-slate-900 border border-slate-700 rounded-lg">
+class="w-full px-4 py-2 bg-slate-900 border border-slate-700 rounded">
 
 
 <label class="text-xs text-slate-400">Follow Up Date</label>
 <input type="date" id="follow"
-class="w-full px-4 py-2 bg-slate-900 border border-slate-700 rounded-lg">
+class="w-full px-4 py-2 bg-slate-900 border border-slate-700 rounded">
 
 
 <div class="flex gap-3 pt-2">
 
-<button class="flex-1 py-2 bg-blue-500 rounded-lg">
+<button class="flex-1 py-2 bg-blue-500 rounded">
 Save
 </button>
 
-<button type="button"
-id="cancel"
-class="flex-1 py-2 bg-slate-700 rounded-lg">
+<button type="button" id="cancel"
+class="flex-1 py-2 bg-slate-700 rounded">
 Cancel
 </button>
 
@@ -245,7 +251,13 @@ Cancel
 
 const $ = id => document.getElementById(id)
 
-let records=[]
+let records = JSON.parse(localStorage.getItem("convergeCRM")) || []
+
+
+function saveData(){
+localStorage.setItem("convergeCRM",JSON.stringify(records))
+}
+
 
 
 function getCommission(plan){
@@ -271,18 +283,18 @@ let commission=records
 
 $("stats").innerHTML=`
 
-<div class="bg-slate-800 p-4 rounded-xl">
-<p class="text-slate-400 text-xs">TOTAL</p>
+<div class="bg-slate-800 p-4 rounded">
+<p class="text-xs text-slate-400">TOTAL</p>
 <p class="text-2xl font-bold">${records.length}</p>
 </div>
 
-<div class="bg-slate-800 p-4 rounded-xl">
-<p class="text-slate-400 text-xs">INSTALLED</p>
+<div class="bg-slate-800 p-4 rounded">
+<p class="text-xs text-slate-400">INSTALLED</p>
 <p class="text-2xl font-bold">${installed}</p>
 </div>
 
-<div class="bg-slate-800 p-4 rounded-xl">
-<p class="text-slate-400 text-xs">COMMISSION</p>
+<div class="bg-slate-800 p-4 rounded">
+<p class="text-xs text-slate-400">COMMISSION</p>
 <p class="text-2xl font-bold text-green-400">₱${commission}</p>
 </div>
 
@@ -306,7 +318,7 @@ Object.entries(stats).forEach(([plan,count])=>{
 
 let div=document.createElement("div")
 
-div.className="bg-slate-900 p-3 rounded-lg text-sm"
+div.className="bg-slate-900 p-3 rounded text-sm"
 
 div.innerHTML=`
 <p class="text-slate-400">${plan}</p>
@@ -364,7 +376,6 @@ tr.innerHTML=`
 </button>
 
 </td>
-
 `
 
 $("table").appendChild(tr)
@@ -386,6 +397,8 @@ let idx=order.indexOf(records[i].status)
 if(idx<order.length-1)
 records[i].status=order[idx+1]
 
+saveData()
+
 renderStats()
 renderTable()
 renderPlanStats()
@@ -397,6 +410,8 @@ renderPlanStats()
 function delRec(i){
 
 records.splice(i,1)
+
+saveData()
 
 renderStats()
 renderTable()
@@ -439,6 +454,8 @@ follow:$("follow").value
 
 })
 
+saveData()
+
 $("modal").classList.add("hidden")
 
 renderStats()
@@ -460,6 +477,43 @@ txt+=`${r.install} - ${r.name}\n`
 })
 
 alert(txt)
+
+}
+
+
+
+$("btn-export").onclick=()=>{
+
+let blob=new Blob([JSON.stringify(records)],{type:"application/json"})
+
+let a=document.createElement("a")
+a.href=URL.createObjectURL(blob)
+a.download="convergeCRM.json"
+a.click()
+
+}
+
+
+
+$("importFile").onchange=e=>{
+
+let file=e.target.files[0]
+
+let reader=new FileReader()
+
+reader.onload=function(){
+
+records=JSON.parse(reader.result)
+
+saveData()
+
+renderStats()
+renderTable()
+renderPlanStats()
+
+}
+
+reader.readAsText(file)
 
 }
 
