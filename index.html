@@ -263,18 +263,20 @@ let map
 
 function login(){
 
-if(user.value=="agent" && pass.value=="1234"){
+let username=document.getElementById("user").value
+let password=document.getElementById("pass").value
 
-login.style.display="none"
-dashboard.style.display="block"
+if(username==="agent" && password==="1234"){
+
+document.getElementById("login").style.display="none"
+document.getElementById("dashboard").style.display="block"
 
 showSection("dash")
-
 initMap()
 
 }else{
 
-alert("Wrong login")
+alert("Wrong username or password")
 
 }
 
@@ -368,7 +370,7 @@ let stage=stages[s.status]
 
 let commission=(s.plan/2)-50
 
-if(stage=="Installed"){
+if(stage==="Installed"){
 
 installedCount++
 totalCommission+=commission
@@ -382,19 +384,14 @@ pendingCount++
 table.innerHTML+=`
 
 <tr>
-
 <td>${s.name}</td>
 <td>${s.phone}</td>
 <td>${s.code}</td>
 <td>₱${s.plan}</td>
 <td>${stage}</td>
-
 <td><button onclick="nextStep(${i})">Next</button></td>
-
 <td><button class="delete" onclick="deleteRow(${i})">Delete</button></td>
-
 </tr>
-
 `
 
 if(map && s.lat && s.lng){
