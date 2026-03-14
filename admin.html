@@ -25,10 +25,6 @@ padding:20px;
 height:100vh;
 }
 
-.sidebar h2{
-margin-bottom:30px;
-}
-
 .sidebar button{
 width:100%;
 padding:12px;
@@ -78,7 +74,7 @@ font-size:18px;
 .cyan{background:#00bcd4}
 .brown{background:#795548}
 
-/* STATUS BADGES */
+/* STATUS COLORS */
 
 .status{
 padding:5px 10px;
@@ -171,7 +167,7 @@ margin-bottom:10px;
 </div>
 
 <div class="chartbox">
-<canvas id="adminChart" width="350" height="350"></canvas>
+<canvas id="adminChart"></canvas>
 </div>
 
 </div>
@@ -184,13 +180,11 @@ margin-bottom:10px;
 
 <table>
 
-<thead>
 <tr>
 <th>Agent</th>
 <th>Installed</th>
 <th>Commission</th>
 </tr>
-</thead>
 
 <tbody id="leaderTable"></tbody>
 
@@ -208,7 +202,6 @@ margin-bottom:10px;
 
 <table>
 
-<thead>
 <tr>
 <th>Agent</th>
 <th>Name</th>
@@ -216,7 +209,6 @@ margin-bottom:10px;
 <th>Status</th>
 <th>Update</th>
 </tr>
-</thead>
 
 <tbody id="table"></tbody>
 
@@ -232,16 +224,14 @@ margin-bottom:10px;
 
 <table>
 
-<thead>
 <tr>
 <th>Name</th>
 <th>Agent</th>
 <th>Plan</th>
 <th>Installer</th>
 <th>Date</th>
-<th>Save</th>
+<th>Action</th>
 </tr>
-</thead>
 
 <tbody id="scheduleTable"></tbody>
 
@@ -257,7 +247,6 @@ margin-bottom:10px;
 
 <table>
 
-<thead>
 <tr>
 <th>Date</th>
 <th>Subscriber</th>
@@ -265,7 +254,6 @@ margin-bottom:10px;
 <th>Installer</th>
 <th>Agent</th>
 </tr>
-</thead>
 
 <tbody id="jobTable"></tbody>
 
@@ -312,11 +300,11 @@ if(p==="jobs") renderJobs()
 
 }
 
-/* UPDATE STATUS */
+/* STATUS UPDATE */
 
 function updateStatus(i,val){
 
-let subs = JSON.parse(localStorage.getItem("subs") || "[]")
+let subs=JSON.parse(localStorage.getItem("subs")||"[]")
 
 subs[i].status=parseInt(val)
 
@@ -330,7 +318,7 @@ render()
 
 function render(){
 
-let subs = JSON.parse(localStorage.getItem("subs") || "[]")
+let subs=JSON.parse(localStorage.getItem("subs")||"[]")
 
 let table=document.getElementById("table")
 let leader=document.getElementById("leaderTable")
@@ -338,7 +326,9 @@ let leader=document.getElementById("leaderTable")
 table.innerHTML=""
 leader.innerHTML=""
 
-let search=document.getElementById("search").value.toLowerCase()
+let search=""
+let searchBox=document.getElementById("search")
+if(searchBox) search=searchBox.value.toLowerCase()
 
 let apps=0,pending=0,installed=0,total=0,weekly=0,monthly=0
 
@@ -346,8 +336,6 @@ let agents={}
 let today=new Date()
 
 subs.forEach((s,i)=>{
-
-if(search && !s.name.toLowerCase().includes(search)) return
 
 apps++
 
@@ -372,6 +360,8 @@ if(diff<=7) weekly+=com
 if(diff<=30) monthly+=com
 
 }
+
+if(search && !s.name.toLowerCase().includes(search)) return
 
 table.innerHTML+=`
 
@@ -459,7 +449,7 @@ backgroundColor:["#6a11cb","#ff9800","#4caf50"]
 
 function renderSchedule(){
 
-let subs = JSON.parse(localStorage.getItem("subs") || "[]")
+let subs=JSON.parse(localStorage.getItem("subs")||"[]")
 
 let table=document.getElementById("scheduleTable")
 
@@ -479,23 +469,27 @@ table.innerHTML+=`
 
 <td>
 
-<select id="installer${i}">
-<option>Team A</option>
-<option>Team B</option>
-<option>Team C</option>
+<select id="installer${i}" ${s.installer?"disabled":""}>
+
+<option ${s.installer=="Team A"?"selected":""}>Team A</option>
+<option ${s.installer=="Team B"?"selected":""}>Team B</option>
+<option ${s.installer=="Team C"?"selected":""}>Team C</option>
+
 </select>
 
 </td>
 
 <td>
 
-<input type="date" id="date${i}">
+<input type="date" id="date${i}" value="${s.installationDate||""}" ${s.installer?"disabled":""}>
 
 </td>
 
 <td>
 
-<button onclick="saveSchedule(${i})">Save</button>
+${s.installer
+?`<button onclick="changeTeam(${i})">Change Team</button>`
+:`<button onclick="saveSchedule(${i})">Save</button>`}
 
 </td>
 
@@ -509,11 +503,11 @@ table.innerHTML+=`
 
 }
 
-/* SAVE INSTALLER */
+/* SAVE SCHEDULE */
 
 function saveSchedule(i){
 
-let subs = JSON.parse(localStorage.getItem("subs") || "[]")
+let subs=JSON.parse(localStorage.getItem("subs")||"[]")
 
 let installer=document.getElementById("installer"+i).value
 let date=document.getElementById("date"+i).value
@@ -523,15 +517,29 @@ subs[i].installationDate=date
 
 localStorage.setItem("subs",JSON.stringify(subs))
 
-alert("Schedule saved")
+renderSchedule()
 
 }
 
-/* INSTALLER JOBS */
+/* CHANGE TEAM */
+
+function changeTeam(i){
+
+let subs=JSON.parse(localStorage.getItem("subs")||"[]")
+
+subs[i].installer=""
+
+localStorage.setItem("subs",JSON.stringify(subs))
+
+renderSchedule()
+
+}
+
+/* DAILY JOBS */
 
 function renderJobs(){
 
-let subs = JSON.parse(localStorage.getItem("subs") || "[]")
+let subs=JSON.parse(localStorage.getItem("subs")||"[]")
 
 let table=document.getElementById("jobTable")
 
@@ -571,7 +579,7 @@ window.location="index.html"
 
 render()
 
-setInterval(render,2000)
+setInterval(render,3000)
 
 </script>
 
