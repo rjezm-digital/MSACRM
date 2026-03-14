@@ -112,6 +112,7 @@ margin-top:20px;
 
 <button onclick="showPage('monitor')">Monitoring</button>
 <button onclick="showPage('subs')">Subscribers</button>
+<button onclick="logout()" style="background:#ff5e62;">Logout</button>
 
 </div>
 
@@ -394,6 +395,14 @@ data:[apps,pending,installed]
 }
 
 render()
+
+function logout(){
+
+localStorage.removeItem("agent")
+
+window.location="index.html"
+
+}
 
 </script>
 
