@@ -24,19 +24,30 @@ width:320px;
 box-shadow:0 10px 30px rgba(0,0,0,.2);
 }
 
+.login h2{
+text-align:center;
+}
+
 input{
 width:100%;
 padding:12px;
 margin:10px 0;
+border:1px solid #ccc;
+border-radius:6px;
 }
 
 button{
 width:100%;
 padding:12px;
-background:#4a6cf7;
+background:#4a6cff;
 border:none;
 color:white;
+border-radius:6px;
 cursor:pointer;
+}
+
+button:hover{
+background:#374fd6;
 }
 
 </style>
@@ -57,11 +68,21 @@ cursor:pointer;
 
 <script>
 
+/* USER DATABASE */
+
 const users={
+
 agent1:{pass:"1234",role:"agent"},
 agent2:{pass:"1234",role:"agent"},
-admin:{pass:"admin123",role:"admin"}
+
+admin:{pass:"admin123",role:"admin"},
+
+installer1:{pass:"1111",role:"installer"},
+installer2:{pass:"1111",role:"installer"}
+
 }
+
+/* LOGIN FUNCTION */
 
 function login(){
 
@@ -70,16 +91,31 @@ let p=document.getElementById("pass").value
 
 if(users[u] && users[u].pass===p){
 
-if(users[u].role==="agent"){
+let role=users[u].role
+
+/* AGENT LOGIN */
+
+if(role==="agent"){
 
 localStorage.setItem("agent",u)
 window.location="agent.html"
 
 }
 
-if(users[u].role==="admin"){
+/* ADMIN LOGIN */
+
+if(role==="admin"){
 
 window.location="admin.html"
+
+}
+
+/* INSTALLER LOGIN */
+
+if(role==="installer"){
+
+localStorage.setItem("installer",u)
+window.location="installer.html"
 
 }
 
