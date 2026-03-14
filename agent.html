@@ -40,6 +40,10 @@ cursor:pointer;
 background:#4e6cff;
 }
 
+.logout{
+background:#ff5e62!important;
+}
+
 /* MAIN */
 
 .main{
@@ -86,6 +90,7 @@ table{
 width:100%;
 background:white;
 border-collapse:collapse;
+margin-top:20px;
 }
 
 th{
@@ -127,7 +132,7 @@ font-size:12px;
 <button onclick="showPage('monitor')">Monitoring</button>
 <button onclick="showPage('subs')">Subscribers</button>
 
-<button onclick="logout()" style="background:#ff5e62;">Logout</button>
+<button class="logout" onclick="logout()">Logout</button>
 
 </div>
 
@@ -258,52 +263,56 @@ Monthly Earnings<br>
 
 <script>
 
-let agent=localStorage.getItem("agent")
-
-let subs=JSON.parse(localStorage.getItem("subs")||"[]")
-
 const stages=["Encoded","OMD","Pending","Approved","For Installation","Installed"]
 
 const colors=["encoded","omd","pending","approved","install","installed"]
 
+let agent = localStorage.getItem("agent")
+
+let subscribers = JSON.parse(localStorage.getItem("subs") || "[]")
+
 let chart
 
-function showPage(p){
+function showPage(page){
 
-monitor.style.display="none"
-subs.style.display="none"
+document.getElementById("monitor").style.display="none"
+document.getElementById("subs").style.display="none"
 
-document.getElementById(p).style.display="block"
+document.getElementById(page).style.display="block"
 
 }
 
-function save(){
-localStorage.setItem("subs",JSON.stringify(subs))
+function saveData(){
+localStorage.setItem("subs",JSON.stringify(subscribers))
 }
 
 function addSubscriber(){
 
-subs.push({
+subscribers.push({
+
 agent:agent,
-name:name.value,
-address:address.value,
-phone:phone.value,
-code:code.value,
-plan:parseInt(plan.value),
+name:document.getElementById("name").value,
+address:document.getElementById("address").value,
+phone:document.getElementById("phone").value,
+code:document.getElementById("code").value,
+plan:parseInt(document.getElementById("plan").value),
 status:0,
 date:new Date()
+
 })
 
-save()
+saveData()
+
 render()
 
 }
 
-function removeSub(i){
+function deleteSubscriber(i){
 
-subs.splice(i,1)
+subscribers.splice(i,1)
 
-save()
+saveData()
+
 render()
 
 }
@@ -319,9 +328,9 @@ let monthly=0
 
 let today=new Date()
 
-table.innerHTML=""
+document.getElementById("table").innerHTML=""
 
-subs.forEach((s,i)=>{
+subscribers.forEach((s,i)=>{
 
 if(s.agent!==agent) return
 
@@ -344,7 +353,7 @@ if(diff<=30) monthly+=com
 
 }
 
-table.innerHTML+=`
+document.getElementById("table").innerHTML+=`
 
 <tr>
 
@@ -358,7 +367,7 @@ ${stages[s.status]}
 </span>
 </td>
 
-<td onclick="removeSub(${i})">X</td>
+<td onclick="deleteSubscriber(${i})">X</td>
 
 </tr>
 
@@ -366,12 +375,13 @@ ${stages[s.status]}
 
 })
 
-apps.innerText=apps
-pending.innerText=pending
-installed.innerText=installed
-total.innerText=total
-weekly.innerText=weekly
-monthly.innerText=monthly
+document.getElementById("apps").innerText=apps
+document.getElementById("pending").innerText=pending
+document.getElementById("installed").innerText=installed
+
+document.getElementById("total").innerText=total
+document.getElementById("weekly").innerText=weekly
+document.getElementById("monthly").innerText=monthly
 
 drawChart(apps,pending,installed)
 
@@ -399,6 +409,7 @@ data:[a,p,i]
 function logout(){
 
 localStorage.removeItem("agent")
+
 window.location="index.html"
 
 }
