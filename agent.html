@@ -15,10 +15,8 @@ display:flex;
 background:#eef1f7;
 }
 
-/* SIDEBAR */
-
 .sidebar{
-width:230px;
+width:240px;
 background:#25324a;
 color:white;
 padding:20px;
@@ -27,12 +25,12 @@ height:100vh;
 
 .sidebar button{
 width:100%;
-margin:8px 0;
 padding:12px;
+margin:8px 0;
 border:none;
+border-radius:8px;
 background:#3c4c6e;
 color:white;
-border-radius:6px;
 cursor:pointer;
 }
 
@@ -44,14 +42,10 @@ background:#4e6cff;
 background:#ff5e62!important;
 }
 
-/* MAIN */
-
 .main{
 flex:1;
 padding:30px;
 }
-
-/* CARDS */
 
 .cards{
 display:grid;
@@ -67,24 +61,27 @@ color:white;
 font-size:18px;
 }
 
-.purple{background:#6a11cb}
-.orange{background:#ff9800}
-.green{background:#4caf50}
-.red{background:#ff5e62}
-.cyan{background:#00bcd4}
-.brown{background:#795548}
-
-/* FORM */
+.c1{background:#7b1fa2}
+.c2{background:#ff9800}
+.c3{background:#4caf50}
+.c4{background:#ff5252}
+.c5{background:#00acc1}
+.c6{background:#795548}
 
 input,select{
 width:100%;
 padding:10px;
-margin:8px 0;
-border-radius:6px;
-border:1px solid #ccc;
+margin:6px 0;
 }
 
-/* TABLE */
+button.add{
+background:#4e6cff;
+color:white;
+border:none;
+padding:10px;
+border-radius:6px;
+cursor:pointer;
+}
 
 table{
 width:100%;
@@ -94,7 +91,8 @@ margin-top:20px;
 }
 
 th{
-background:#f2f2f2;
+background:#4e6cff;
+color:white;
 }
 
 th,td{
@@ -103,24 +101,15 @@ border-bottom:1px solid #eee;
 text-align:center;
 }
 
-/* STATUS COLORS */
-
 .status{
-padding:4px 8px;
+padding:4px 10px;
 border-radius:6px;
 color:white;
-font-size:12px;
 }
 
-.encoded{background:#9e9e9e}
-.omd{background:#2196f3}
-.pending{background:#ff9800}
-.approved{background:#9c27b0}
-.install{background:#ffc107;color:black}
-.installed{background:#4caf50}
+.encoded{background:#777}
 
 </style>
-
 </head>
 
 <body>
@@ -136,6 +125,7 @@ font-size:12px;
 
 </div>
 
+
 <div class="main">
 
 <!-- MONITORING -->
@@ -146,41 +136,42 @@ font-size:12px;
 
 <div class="cards">
 
-<div class="card purple">
+<div class="card c1">
 Applications<br>
-<span id="apps">0</span>
+<span id="applications">0</span>
 </div>
 
-<div class="card orange">
+<div class="card c2">
 Pending<br>
 <span id="pending">0</span>
 </div>
 
-<div class="card green">
+<div class="card c3">
 Installed<br>
 <span id="installed">0</span>
 </div>
 
-<div class="card red">
+<div class="card c4">
 Total Earnings<br>
-₱<span id="total">0</span>
+₱<span id="earnings">0</span>
 </div>
 
-<div class="card cyan">
+<div class="card c5">
 Weekly Earnings<br>
 ₱<span id="weekly">0</span>
 </div>
 
-<div class="card brown">
+<div class="card c6">
 Monthly Earnings<br>
 ₱<span id="monthly">0</span>
 </div>
 
 </div>
 
-<canvas id="salesChart"></canvas>
+<canvas id="chart"></canvas>
 
 </div>
+
 
 <!-- SUBSCRIBERS -->
 
@@ -189,71 +180,57 @@ Monthly Earnings<br>
 <h2>Add Subscriber</h2>
 
 <input id="name" placeholder="Subscriber Name">
+
 <input id="address" placeholder="Address">
+
 <input id="phone" placeholder="Phone Number">
-<input id="code" placeholder="Application Code">
+
+<input id="appcode" placeholder="Application Code">
+
+<input id="lat" placeholder="Latitude">
+
+<input id="long" placeholder="Longitude">
 
 <select id="plan">
-
-<!-- SUPER FIBER -->
-
-<option value="1349">Super FiberX Play 1349</option>
-<option value="1599">Super FiberX Max 1599</option>
-<option value="2599">Super FiberX Ultra 2599</option>
-
-<!-- FIBERX -->
 
 <option value="1500">FiberX 1500</option>
 <option value="2000">FiberX 2000</option>
 <option value="2500">FiberX 2500</option>
 <option value="3500">FiberX 3500</option>
-<option value="7000">FiberX 7000</option>
 
-<!-- BUNDLES -->
+<option value="1349">FiberX Play 1349</option>
+<option value="1599">FiberX Play 1599</option>
+<option value="1999">FiberX Play 1999</option>
 
-<option value="1700">FiberX 1500 + Vision</option>
-<option value="2200">FiberX 2000 + Vision</option>
-<option value="2700">FiberX 2500 + Vision</option>
+<option value="2899">FiberX Bundle 2899</option>
+<option value="3799">FiberX Bundle 3799</option>
 
-<!-- TOD -->
+<option value="3000">MicroBiz 3000</option>
+<option value="4000">MicroBiz 4000</option>
 
-<option value="1699">TOD 1699</option>
-<option value="1999">TOD 1999</option>
-<option value="3000">TOD 3000</option>
-<option value="3500">TOD 3500</option>
-
-<!-- FLEXIBIZ -->
-
-<option value="1500">FlexiBiz 1500</option>
-<option value="2000">FlexiBiz 2000</option>
-<option value="3000">FlexiBiz 3000</option>
 <option value="5000">FlexiBiz 5000</option>
+<option value="7000">FlexiBiz 7000</option>
 
-<!-- MICROBIZ -->
+<option value="10000">BIZ 10000</option>
 
-<option value="1449">MicroBiz MAX 1449</option>
-<option value="1549">MicroBiz MAX 1549</option>
-<option value="1749">MicroBiz MAX 1749</option>
-<option value="2099">MicroBiz MAX 2099</option>
-<option value="2449">MicroBiz MAX 2449</option>
+<option value="999">TOD 999</option>
+<option value="1299">TOD 1299</option>
 
 </select>
 
-<button onclick="addSubscriber()">Add Subscriber</button>
-
-<h3>My Applications</h3>
+<button class="add" onclick="addSubscriber()">
+Add Subscriber
+</button>
 
 <table>
 
 <tr>
-<th>Agent</th>
 <th>Name</th>
 <th>Plan</th>
 <th>Status</th>
-<th>Delete</th>
 </tr>
 
-<tbody id="table"></tbody>
+<tbody id="subTable"></tbody>
 
 </table>
 
@@ -261,150 +238,139 @@ Monthly Earnings<br>
 
 </div>
 
+
 <script>
 
-const stages=["Encoded","OMD","Pending","Approved","For Installation","Installed"]
+/* PAGE SWITCH */
 
-const colors=["encoded","omd","pending","approved","install","installed"]
-
-let agent = localStorage.getItem("agent")
-
-let subscribers = JSON.parse(localStorage.getItem("subs") || "[]")
-
-let chart
-
-function showPage(page){
+function showPage(p){
 
 document.getElementById("monitor").style.display="none"
 document.getElementById("subs").style.display="none"
 
-document.getElementById(page).style.display="block"
+document.getElementById(p).style.display="block"
 
 }
 
-function saveData(){
-localStorage.setItem("subs",JSON.stringify(subscribers))
+
+/* DATABASE */
+
+function getSubs(){
+
+let data=localStorage.getItem("subs")
+
+if(!data) return []
+
+return JSON.parse(data)
+
 }
+
+
+/* ADD SUBSCRIBER */
 
 function addSubscriber(){
 
-subscribers.push({
+let subs=getSubs()
 
-agent:agent,
+let plan=document.getElementById("plan").value
+
+subs.push({
+
 name:document.getElementById("name").value,
 address:document.getElementById("address").value,
 phone:document.getElementById("phone").value,
-code:document.getElementById("code").value,
-plan:parseInt(document.getElementById("plan").value),
-status:0,
-date:new Date()
+appcode:document.getElementById("appcode").value,
+lat:document.getElementById("lat").value,
+long:document.getElementById("long").value,
+plan:plan,
+agent:localStorage.getItem("agent"),
+status:0
 
 })
 
-saveData()
+localStorage.setItem("subs",JSON.stringify(subs))
 
 render()
 
 }
 
-function deleteSubscriber(i){
 
-subscribers.splice(i,1)
-
-saveData()
-
-render()
-
-}
+/* RENDER */
 
 function render(){
 
-let apps=0
+let subs=getSubs()
+
+let table=document.getElementById("subTable")
+
+table.innerHTML=""
+
+let applications=0
 let pending=0
 let installed=0
-let total=0
-let weekly=0
-let monthly=0
+let earnings=0
 
-let today=new Date()
+subs.forEach(s=>{
 
-document.getElementById("table").innerHTML=""
+if(s.agent==localStorage.getItem("agent")){
 
-subscribers.forEach((s,i)=>{
+applications++
 
-if(s.agent!==agent) return
-
-apps++
-
-if(stages[s.status]=="Pending") pending++
-
-if(stages[s.status]=="Installed"){
+if(s.status==5){
 
 installed++
 
-let com=(s.plan/2)-50
-
-total+=com
-
-let diff=(today-new Date(s.date))/(1000*60*60*24)
-
-if(diff<=7) weekly+=com
-if(diff<=30) monthly+=com
+earnings+= (s.plan/2)-50
 
 }
 
-document.getElementById("table").innerHTML+=`
+table.innerHTML+=`
 
 <tr>
 
-<td>${s.agent}</td>
 <td>${s.name}</td>
+
 <td>${s.plan}</td>
 
-<td>
-<span class="status ${colors[s.status]}">
-${stages[s.status]}
-</span>
-</td>
-
-<td onclick="deleteSubscriber(${i})">X</td>
+<td><span class="status encoded">Encoded</span></td>
 
 </tr>
 
 `
 
+}
+
 })
 
-document.getElementById("apps").innerText=apps
-document.getElementById("pending").innerText=pending
+document.getElementById("applications").innerText=applications
 document.getElementById("installed").innerText=installed
-
-document.getElementById("total").innerText=total
-document.getElementById("weekly").innerText=weekly
-document.getElementById("monthly").innerText=monthly
-
-drawChart(apps,pending,installed)
+document.getElementById("earnings").innerText=earnings
+document.getElementById("weekly").innerText=earnings
+document.getElementById("monthly").innerText=earnings
 
 }
 
-function drawChart(a,p,i){
 
-if(chart) chart.destroy()
+/* GRAPH */
 
-chart=new Chart(document.getElementById("salesChart"),{
+new Chart(document.getElementById("chart"),{
 
 type:"bar",
 
 data:{
-labels:["Applications","Pending","Installed"],
+labels:["Applications","Installed"],
 datasets:[{
-data:[a,p,i]
+
+data:[0,0]
+
 }]
+
 }
 
 })
 
-}
+
+/* LOGOUT */
 
 function logout(){
 
