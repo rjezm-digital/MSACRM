@@ -84,6 +84,8 @@ min-height:100vh;
 display:none;
 }
 
+/* CARDS */
+
 .cards{
 display:grid;
 grid-template-columns:repeat(3,1fr);
@@ -174,7 +176,7 @@ border-radius:10px;
 <h2>Add Subscriber</h2>
 
 <input id="name" placeholder="Subscriber Name">
-<input id="phone" placeholder="Phone">
+<input id="phone" placeholder="Phone Number">
 <input id="code" placeholder="Application Code">
 <input id="lat" placeholder="Latitude">
 <input id="lng" placeholder="Longitude">
@@ -213,7 +215,7 @@ border-radius:10px;
 
 </select>
 
-<button onclick="addSubscriber()">Add</button>
+<button onclick="addSubscriber()">Add Subscriber</button>
 
 </div>
 
@@ -303,21 +305,25 @@ localStorage.setItem("subs",JSON.stringify(subscribers))
 
 function login(){
 
-let u=user.value
-let p=pass.value
+let u=document.getElementById("user").value
+let p=document.getElementById("pass").value
 
 if(users[u] && users[u]===p){
 
 currentUser=u
 isAdmin=(u==="admin")
 
-login.style.display="none"
-dashboard.style.display="block"
+document.getElementById("login").style.display="none"
+document.getElementById("dashboard").style.display="block"
 
-panelTitle.innerText=isAdmin?"Admin Panel":"Agent Panel"
+document.getElementById("panelTitle").innerText=isAdmin?"Admin Panel":"Agent Panel"
 
 showSection("dash")
 render()
+
+}else{
+
+alert("Invalid username or password")
 
 }
 
@@ -325,15 +331,14 @@ render()
 
 function logout(){
 
-dashboard.style.display="none"
-login.style.display="block"
+document.getElementById("dashboard").style.display="none"
+document.getElementById("login").style.display="block"
 
 }
 
 function showSection(id){
 
 document.querySelectorAll(".section").forEach(s=>s.style.display="none")
-
 document.getElementById(id).style.display="block"
 
 if(id==="mapsec") loadMap()
@@ -344,11 +349,11 @@ function addSubscriber(){
 
 subscribers.push({
 agent:currentUser,
-name:name.value,
-plan:parseInt(plan.value),
+name:document.getElementById("name").value,
+plan:parseInt(document.getElementById("plan").value),
 status:0,
-lat:lat.value,
-lng:lng.value,
+lat:document.getElementById("lat").value,
+lng:document.getElementById("lng").value,
 date:new Date()
 })
 
@@ -422,12 +427,12 @@ table.innerHTML+=`
 
 })
 
-apps.innerText=apps
-pending.innerText=pending
-install.innerText=install
-installed.innerText=installed
-released.innerText=released
-weekly.innerText=weekly
+document.getElementById("apps").innerText=apps
+document.getElementById("pending").innerText=pending
+document.getElementById("install").innerText=install
+document.getElementById("installed").innerText=installed
+document.getElementById("released").innerText=released
+document.getElementById("weekly").innerText=weekly
 
 drawCharts(agents)
 
@@ -468,9 +473,7 @@ subscribers.forEach(s=>{
 if(!isAdmin && s.agent!==currentUser) return
 
 if(s.lat && s.lng){
-
 cluster.addLayer(L.marker([s.lat,s.lng]))
-
 }
 
 })
