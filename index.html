@@ -6,6 +6,7 @@
 
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
 <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster/dist/MarkerCluster.css"/>
+<link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster/dist/MarkerCluster.Default.css"/>
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
@@ -125,14 +126,29 @@ text-align:center;
 }
 
 #map{
-height:500px;
+height:520px;
 }
 
-.chartbox{
+.formbox{
 background:white;
 padding:20px;
-margin-top:20px;
 border-radius:10px;
+width:500px;
+}
+
+.formbox input,
+.formbox select{
+width:100%;
+padding:10px;
+margin:8px 0;
+}
+
+.formbox button{
+background:#4a6cf7;
+color:white;
+border:none;
+padding:10px;
+width:100%;
 }
 
 </style>
@@ -173,73 +189,66 @@ border-radius:10px;
 
 <div id="add" class="section">
 
-<h2>Add Subscriber</h2>
+<div class="formbox">
+
+<h3>Add Subscriber</h3>
 
 <input id="name" placeholder="Subscriber Name">
 <input id="phone" placeholder="Phone Number">
 <input id="code" placeholder="Application Code">
-<input id="lat" placeholder="Latitude">
-<input id="lng" placeholder="Longitude">
 
 <select id="plan">
 
+<optgroup label="Super Fiber">
 <option value="1349">Super FiberX Play 1349</option>
 <option value="1599">Super FiberX Max 1599</option>
 <option value="2599">Super FiberX Ultra 2599</option>
+</optgroup>
 
+<optgroup label="FiberX">
 <option value="1500">FiberX 1500</option>
 <option value="2000">FiberX 2000</option>
 <option value="2500">FiberX 2500</option>
 <option value="3500">FiberX 3500</option>
 <option value="7000">FiberX 7000</option>
+</optgroup>
 
+<optgroup label="FiberX Bundles">
 <option value="1700">FiberX 1500 + Vision</option>
 <option value="2200">FiberX 2000 + Vision</option>
 <option value="2700">FiberX 2500 + Vision</option>
+</optgroup>
 
+<optgroup label="TOD">
 <option value="1699">TOD 1699</option>
 <option value="1999">TOD 1999</option>
 <option value="3000">TOD 3000</option>
 <option value="3500">TOD 3500</option>
+</optgroup>
 
+<optgroup label="FlexiBIZ">
 <option value="1500">FlexiBIZ 1500</option>
 <option value="2000">FlexiBIZ 2000</option>
 <option value="3000">FlexiBIZ 3000</option>
 <option value="5000">FlexiBIZ 5000</option>
+</optgroup>
 
+<optgroup label="MicroBIZ MAX">
 <option value="1449">MicroBIZ MAX 1449</option>
 <option value="1549">MicroBIZ MAX 1549</option>
 <option value="1749">MicroBIZ MAX 1749</option>
 <option value="2099">MicroBIZ MAX 2099</option>
 <option value="2449">MicroBIZ MAX 2449</option>
+</optgroup>
 
 </select>
+
+<input id="lat" placeholder="Latitude">
+<input id="lng" placeholder="Longitude">
 
 <button onclick="addSubscriber()">Add Subscriber</button>
 
 </div>
-
-<!-- SUBSCRIBERS -->
-
-<div id="subs" class="section">
-
-<h2>Subscribers</h2>
-
-<table>
-
-<thead>
-<tr>
-<th>Agent</th>
-<th>Name</th>
-<th>Plan</th>
-<th>Status</th>
-<th>Next</th>
-</tr>
-</thead>
-
-<tbody id="table"></tbody>
-
-</table>
 
 </div>
 
@@ -253,16 +262,35 @@ border-radius:10px;
 
 <div class="card c1">Applications<br><span id="apps">0</span></div>
 <div class="card c2">Pending<br><span id="pending">0</span></div>
-<div class="card c3">For Installation<br><span id="install">0</span></div>
-<div class="card c4">Installed<br><span id="installed">0</span></div>
-<div class="card c5">Commission<br>₱<span id="released">0</span></div>
-<div class="card c6">Weekly Commission<br>₱<span id="weekly">0</span></div>
+<div class="card c3">Installed<br><span id="installed">0</span></div>
+<div class="card c4">For Installation<br><span id="install">0</span></div>
+<div class="card c5">Total Released Commission<br>₱<span id="released">0</span></div>
+<div class="card c6">Commission This Week<br>₱<span id="weekly">0</span></div>
 
 </div>
 
-<div class="chartbox">
-<canvas id="agentChart"></canvas>
 </div>
+
+<!-- ADMIN SUBSCRIBERS -->
+
+<div id="subs" class="section">
+
+<h2>Installed Subscribers by Agent</h2>
+
+<table>
+
+<thead>
+<tr>
+<th>Agent</th>
+<th>Subscriber</th>
+<th>Plan</th>
+<th>Commission</th>
+</tr>
+</thead>
+
+<tbody id="table"></tbody>
+
+</table>
 
 </div>
 
@@ -321,10 +349,6 @@ document.getElementById("panelTitle").innerText=isAdmin?"Admin Panel":"Agent Pan
 showSection("dash")
 render()
 
-}else{
-
-alert("Invalid username or password")
-
 }
 
 }
@@ -351,9 +375,9 @@ subscribers.push({
 agent:currentUser,
 name:document.getElementById("name").value,
 plan:parseInt(document.getElementById("plan").value),
-status:0,
 lat:document.getElementById("lat").value,
 lng:document.getElementById("lng").value,
+status:0,
 date:new Date()
 })
 
@@ -362,20 +386,7 @@ render()
 
 }
 
-function nextStatus(i){
-
-if(subscribers[i].status<5)
-subscribers[i].status++
-
-save()
-render()
-
-}
-
 function render(){
-
-let table=document.getElementById("table")
-table.innerHTML=""
 
 let apps=0
 let pending=0
@@ -384,11 +395,12 @@ let installed=0
 let released=0
 let weekly=0
 
-let agents={}
+let table=document.getElementById("table")
+table.innerHTML=""
 
 let now=new Date()
 
-subscribers.forEach((s,i)=>{
+subscribers.forEach((s)=>{
 
 if(!isAdmin && s.agent!==currentUser) return
 
@@ -406,24 +418,19 @@ if(stage==="Installed"){
 installed++
 released+=commission
 
-if(!agents[s.agent]) agents[s.agent]=0
-agents[s.agent]++
-
 let diff=(now-new Date(s.date))/86400000
-
 if(diff<=7) weekly+=commission
-
-}
 
 table.innerHTML+=`
 <tr>
 <td>${s.agent}</td>
 <td>${s.name}</td>
 <td>₱${s.plan}</td>
-<td>${stage}</td>
-<td><button onclick="nextStatus(${i})">Next</button></td>
+<td>₱${commission}</td>
 </tr>
 `
+
+}
 
 })
 
@@ -433,25 +440,6 @@ document.getElementById("install").innerText=install
 document.getElementById("installed").innerText=installed
 document.getElementById("released").innerText=released
 document.getElementById("weekly").innerText=weekly
-
-drawCharts(agents)
-
-}
-
-function drawCharts(agentData){
-
-new Chart(document.getElementById("agentChart"),{
-
-type:'bar',
-data:{
-labels:Object.keys(agentData),
-datasets:[{
-label:'Installs per Agent',
-data:Object.values(agentData)
-}]
-}
-
-})
 
 }
 
@@ -466,14 +454,16 @@ map=L.map('map').setView([9.65,124.02],11)
 
 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map)
 
-cluster=L.markerClusterGroup()
+cluster=L.markerClusterGroup({maxClusterRadius:60})
 
 subscribers.forEach(s=>{
 
 if(!isAdmin && s.agent!==currentUser) return
 
 if(s.lat && s.lng){
+
 cluster.addLayer(L.marker([s.lat,s.lng]))
+
 }
 
 })
