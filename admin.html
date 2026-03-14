@@ -21,18 +21,12 @@ display:flex;
 background:#eef1f7;
 }
 
-/* SIDEBAR */
-
 .sidebar{
 width:240px;
 background:#25324a;
 color:white;
 padding:20px;
 height:100vh;
-}
-
-.sidebar h2{
-margin-bottom:30px;
 }
 
 .sidebar button{
@@ -44,7 +38,6 @@ border-radius:8px;
 background:#3c4c6e;
 color:white;
 cursor:pointer;
-font-size:15px;
 }
 
 .sidebar button:hover{
@@ -55,14 +48,10 @@ background:#4e6cff;
 background:#ff5e62!important;
 }
 
-/* MAIN */
-
 .main{
 flex:1;
 padding:30px;
 }
-
-/* CARDS */
 
 .cards{
 display:grid;
@@ -85,8 +74,6 @@ font-size:18px;
 .cyan{background:#00bcd4}
 .brown{background:#795548}
 
-/* CHART */
-
 .chartbox{
 background:white;
 padding:20px;
@@ -94,8 +81,6 @@ border-radius:10px;
 width:420px;
 margin-bottom:30px;
 }
-
-/* TABLE */
 
 table{
 width:100%;
@@ -120,8 +105,6 @@ padding:10px;
 width:300px;
 margin-bottom:10px;
 }
-
-/* MAP */
 
 #map{
 height:450px;
@@ -158,35 +141,12 @@ border-radius:10px;
 
 <div class="cards">
 
-<div class="card purple">
-Applications<br>
-<span id="apps">0</span>
-</div>
-
-<div class="card orange">
-Pending<br>
-<span id="pending">0</span>
-</div>
-
-<div class="card green">
-Installed<br>
-<span id="installed">0</span>
-</div>
-
-<div class="card red">
-Commission Released<br>
-₱<span id="total">0</span>
-</div>
-
-<div class="card cyan">
-Weekly Commission<br>
-₱<span id="weekly">0</span>
-</div>
-
-<div class="card brown">
-Monthly Commission<br>
-₱<span id="monthly">0</span>
-</div>
+<div class="card purple">Applications<br><span id="apps">0</span></div>
+<div class="card orange">Pending<br><span id="pending">0</span></div>
+<div class="card green">Installed<br><span id="installed">0</span></div>
+<div class="card red">Commission Released<br>₱<span id="total">0</span></div>
+<div class="card cyan">Weekly Commission<br>₱<span id="weekly">0</span></div>
+<div class="card brown">Monthly Commission<br>₱<span id="monthly">0</span></div>
 
 </div>
 
@@ -234,6 +194,7 @@ Monthly Commission<br>
 <th>Name</th>
 <th>Plan</th>
 <th>Status</th>
+<th>Update</th>
 </tr>
 </thead>
 
@@ -307,7 +268,12 @@ Monthly Commission<br>
 <script>
 
 const stages=[
-"Applied","OMD","Pending","Approved","For Installation","Installed"
+"Encoded",
+"OMD",
+"Pending",
+"Approved",
+"For Installation",
+"Installed"
 ]
 
 let chart
@@ -334,9 +300,21 @@ mapLoaded=true
 
 }
 
+function updateStatus(i,val){
+
+let subs = JSON.parse(localStorage.getItem("subs")||"[]")
+
+subs[i].status=parseInt(val)
+
+localStorage.setItem("subs",JSON.stringify(subs))
+
+render()
+
+}
+
 function render(){
 
-let subs = JSON.parse(localStorage.getItem("subs") || [])
+let subs = JSON.parse(localStorage.getItem("subs")||"[]")
 
 let table=document.getElementById("table")
 let leader=document.getElementById("leaderTable")
@@ -351,7 +329,7 @@ let apps=0,pending=0,installed=0,total=0,weekly=0,monthly=0
 let agents={}
 let today=new Date()
 
-subs.forEach((s)=>{
+subs.forEach((s,i)=>{
 
 if(search && !s.name.toLowerCase().includes(search)) return
 
@@ -380,12 +358,32 @@ if(diff<=30) monthly+=com
 }
 
 table.innerHTML+=`
+
 <tr>
+
 <td>${s.agent}</td>
 <td>${s.name}</td>
 <td>${s.plan}</td>
+
 <td>${stages[s.status]}</td>
+
+<td>
+
+<select onchange="updateStatus(${i},this.value)">
+
+<option value="0">Encoded</option>
+<option value="1">OMD</option>
+<option value="2">Pending</option>
+<option value="3">Approved</option>
+<option value="4">For Installation</option>
+<option value="5">Installed</option>
+
+</select>
+
+</td>
+
 </tr>
+
 `
 
 })
@@ -400,11 +398,13 @@ monthly.innerText=monthly
 for(let a in agents){
 
 leader.innerHTML+=`
+
 <tr>
 <td>${a}</td>
 <td>${agents[a].installs}</td>
 <td>₱${agents[a].earn}</td>
 </tr>
+
 `
 
 }
@@ -435,7 +435,7 @@ backgroundColor:["#6a11cb","#ff9800","#4caf50"]
 
 function renderSchedule(){
 
-let subs = JSON.parse(localStorage.getItem("subs") || [])
+let subs = JSON.parse(localStorage.getItem("subs")||"[]")
 
 let table=document.getElementById("scheduleTable")
 table.innerHTML=""
@@ -453,19 +453,25 @@ table.innerHTML+=`
 <td>${s.plan}</td>
 
 <td>
+
 <select id="installer${i}">
 <option>Team A</option>
 <option>Team B</option>
 <option>Team C</option>
 </select>
+
 </td>
 
 <td>
+
 <input type="date" id="date${i}">
+
 </td>
 
 <td>
+
 <button onclick="saveSchedule(${i})">Save</button>
+
 </td>
 
 </tr>
@@ -480,7 +486,7 @@ table.innerHTML+=`
 
 function saveSchedule(i){
 
-let subs = JSON.parse(localStorage.getItem("subs") || [])
+let subs = JSON.parse(localStorage.getItem("subs")||"[]")
 
 let installer=document.getElementById("installer"+i).value
 let date=document.getElementById("date"+i).value
@@ -496,7 +502,7 @@ alert("Schedule saved")
 
 function renderJobs(){
 
-let subs = JSON.parse(localStorage.getItem("subs") || [])
+let subs = JSON.parse(localStorage.getItem("subs")||"[]")
 
 let table=document.getElementById("jobTable")
 table.innerHTML=""
@@ -529,7 +535,7 @@ table.innerHTML+=`
 
 function loadMap(){
 
-let subs = JSON.parse(localStorage.getItem("subs") || [])
+let subs = JSON.parse(localStorage.getItem("subs")||"[]")
 
 let map=L.map('map').setView([9.7,124],10)
 
