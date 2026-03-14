@@ -13,8 +13,10 @@ display:flex;
 background:#eef1f7;
 }
 
+/* SIDEBAR */
+
 .sidebar{
-width:220px;
+width:240px;
 background:#25324a;
 color:white;
 padding:20px;
@@ -23,31 +25,75 @@ height:100vh;
 
 .sidebar button{
 width:100%;
+padding:12px;
 margin:8px 0;
-padding:10px;
-background:#3c4c6e;
 border:none;
+border-radius:8px;
+background:#3c4c6e;
 color:white;
-border-radius:6px;
+cursor:pointer;
 }
+
+.sidebar button:hover{
+background:#4e6cff;
+}
+
+.logout{
+background:#ff5e62!important;
+}
+
+/* MAIN */
 
 .main{
 flex:1;
 padding:30px;
 }
 
-.card{
-background:white;
-padding:20px;
-border-radius:10px;
-margin-bottom:15px;
+/* CARDS */
+
+.cards{
+display:grid;
+grid-template-columns:repeat(3,1fr);
+gap:20px;
+margin-bottom:30px;
 }
 
-.complete{
-background:#4caf50;
+.card{
+padding:20px;
+border-radius:10px;
 color:white;
-padding:8px 12px;
+font-size:18px;
+}
+
+.blue{background:#2196f3}
+.green{background:#4caf50}
+.orange{background:#ff9800}
+
+/* TABLE */
+
+table{
+width:100%;
+background:white;
+border-collapse:collapse;
+margin-top:20px;
+}
+
+th{
+background:#4e6cff;
+color:white;
+}
+
+th,td{
+padding:10px;
+border-bottom:1px solid #eee;
+text-align:center;
+}
+
+button.install{
+background:#4caf50;
 border:none;
+padding:8px 12px;
+color:white;
 border-radius:6px;
 cursor:pointer;
 }
@@ -62,54 +108,152 @@ cursor:pointer;
 
 <h2>Installer Panel</h2>
 
+<button onclick="showPage('dashboard')">Dashboard</button>
 <button onclick="showPage('jobs')">Today's Jobs</button>
-<button onclick="logout()">Logout</button>
+
+<button class="logout" onclick="logout()">Logout</button>
 
 </div>
 
 <div class="main">
 
+<!-- DASHBOARD -->
+
+<div id="dashboard">
+
+<h2>Installer Dashboard</h2>
+
+<div class="cards">
+
+<div class="card blue">
+Total Jobs Today<br>
+<span id="totalJobs">0</span>
+</div>
+
+<div class="card orange">
+Pending Installations<br>
+<span id="pendingJobs">0</span>
+</div>
+
+<div class="card green">
+Completed Today<br>
+<span id="doneJobs">0</span>
+</div>
+
+</div>
+
+</div>
+
+<!-- JOB LIST -->
+
+<div id="jobs" style="display:none">
+
 <h2>Today's Installation Jobs</h2>
 
-<div id="jobsList"></div>
+<table>
+
+<tr>
+<th>Subscriber</th>
+<th>Plan</th>
+<th>Agent</th>
+<th>Installer Team</th>
+<th>Date</th>
+<th>Action</th>
+</tr>
+
+<tbody id="jobTable"></tbody>
+
+</table>
+
+</div>
 
 </div>
 
 <script>
 
-let installer = localStorage.getItem("installer")
+/* PAGE SWITCH */
 
-let subs = JSON.parse(localStorage.getItem("subs") || "[]")
+function showPage(p){
 
-function renderJobs(){
+document.getElementById("dashboard").style.display="none"
+document.getElementById("jobs").style.display="none"
 
-let list = document.getElementById("jobsList")
+document.getElementById(p).style.display="block"
 
-list.innerHTML=""
+}
 
-let today = new Date().toISOString().split("T")[0]
+/* GET DATA */
+
+function getSubs(){
+
+let data = localStorage.getItem("subs")
+
+if(!data) return []
+
+return JSON.parse(data)
+
+}
+
+/* INSTALL COMPLETE */
+
+function markInstalled(i){
+
+let subs=getSubs()
+
+subs[i].status=5
+
+localStorage.setItem("subs",JSON.stringify(subs))
+
+render()
+
+}
+
+/* MAIN RENDER */
+
+function render(){
+
+let subs=getSubs()
+
+let today=new Date().toISOString().split("T")[0]
+
+let table=document.getElementById("jobTable")
+
+table.innerHTML=""
+
+let total=0
+let pending=0
+let done=0
 
 subs.forEach((s,i)=>{
 
-if(s.installer==installer && s.installationDate==today){
+if(s.installationDate==today){
 
-list.innerHTML += `
+total++
 
-<div class="card">
+if(s.status!=5) pending++
 
-<b>${s.name}</b><br>
+if(s.status==5) done++
 
-Address: ${s.address}<br>
-Plan: ${s.plan}<br>
-Agent: ${s.agent}<br>
+table.innerHTML+=`
 
-<button class="complete" onclick="completeInstall(${i})">
+<tr>
 
-Mark Installed
+<td>${s.name}</td>
+<td>${s.plan}</td>
+<td>${s.agent}</td>
+<td>${s.installer || "-"}</td>
+<td>${s.installationDate}</td>
 
-</button>
+<td>
 
-</div>
+${s.status==5
+?"Completed"
+:`<button class="install" onclick="markInstalled(${i})">Mark Installed</button>`
+}
+
+</td>
+
+</tr>
 
 `
 
@@ -117,29 +261,21 @@ Mark Installed
 
 })
 
-}
-
-function completeInstall(i){
-
-subs[i].status = 5
-
-localStorage.setItem("subs",JSON.stringify(subs))
-
-alert("Installation completed")
-
-renderJobs()
+document.getElementById("totalJobs").innerText=total
+document.getElementById("pendingJobs").innerText=pending
+document.getElementById("doneJobs").innerText=done
 
 }
 
 function logout(){
-
-localStorage.removeItem("installer")
-
 window.location="index.html"
-
 }
 
-renderJobs()
+/* AUTO SYNC */
+
+render()
+
+setInterval(render,2000)
 
 </script>
 

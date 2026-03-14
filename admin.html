@@ -1,9 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-
 <title>Admin Panel</title>
-
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 <style>
@@ -14,8 +12,6 @@ font-family:Arial;
 display:flex;
 background:#eef1f7;
 }
-
-/* SIDEBAR */
 
 .sidebar{
 width:240px;
@@ -44,14 +40,10 @@ background:#4e6cff;
 background:#ff5e62!important;
 }
 
-/* MAIN */
-
 .main{
 flex:1;
 padding:30px;
 }
-
-/* CARDS */
 
 .cards{
 display:grid;
@@ -74,8 +66,6 @@ font-size:18px;
 .cyan{background:#00bcd4}
 .brown{background:#795548}
 
-/* STATUS COLORS */
-
 .status{
 padding:5px 10px;
 border-radius:6px;
@@ -90,8 +80,6 @@ font-size:12px;
 .install{background:#ffc107;color:black}
 .installed{background:#4caf50}
 
-/* CHART */
-
 .chartbox{
 background:white;
 padding:20px;
@@ -99,8 +87,6 @@ border-radius:10px;
 width:420px;
 margin-bottom:30px;
 }
-
-/* TABLE */
 
 table{
 width:100%;
@@ -127,7 +113,6 @@ margin-bottom:10px;
 }
 
 </style>
-
 </head>
 
 <body>
@@ -265,23 +250,9 @@ margin-bottom:10px;
 
 <script>
 
-const stages=[
-"Encoded",
-"OMD",
-"Pending",
-"Approved",
-"For Installation",
-"Installed"
-]
+const stages=["Encoded","OMD","Pending","Approved","For Installation","Installed"]
 
-const statusClass=[
-"encoded",
-"omd",
-"pending",
-"approved",
-"install",
-"installed"
-]
+const statusClass=["encoded","omd","pending","approved","install","installed"]
 
 let chart
 
@@ -300,40 +271,38 @@ if(p==="jobs") renderJobs()
 
 }
 
-/* STATUS UPDATE */
-
-function updateStatus(i,val){
-
-let subs=JSON.parse(localStorage.getItem("subs")||"[]")
-
-subs[i].status=parseInt(val)
-
-localStorage.setItem("subs",JSON.stringify(subs))
-
-render()
-
+function getSubs(){
+let data=localStorage.getItem("subs")
+if(!data) return []
+return JSON.parse(data)
 }
 
-/* MAIN RENDER */
+function updateStatus(i,val){
+let subs=getSubs()
+subs[i].status=parseInt(val)
+localStorage.setItem("subs",JSON.stringify(subs))
+render()
+}
 
 function render(){
 
-let subs=JSON.parse(localStorage.getItem("subs")||"[]")
+let subs=getSubs()
+
+let apps=0,pending=0,installed=0,total=0,weekly=0,monthly=0
+
+let today=new Date()
+
+let agents={}
 
 let table=document.getElementById("table")
 let leader=document.getElementById("leaderTable")
 
-table.innerHTML=""
-leader.innerHTML=""
+if(table) table.innerHTML=""
+if(leader) leader.innerHTML=""
 
 let search=""
 let searchBox=document.getElementById("search")
 if(searchBox) search=searchBox.value.toLowerCase()
-
-let apps=0,pending=0,installed=0,total=0,weekly=0,monthly=0
-
-let agents={}
-let today=new Date()
 
 subs.forEach((s,i)=>{
 
@@ -361,6 +330,8 @@ if(diff<=30) monthly+=com
 
 }
 
+if(table){
+
 if(search && !s.name.toLowerCase().includes(search)) return
 
 table.innerHTML+=`
@@ -371,11 +342,7 @@ table.innerHTML+=`
 <td>${s.name}</td>
 <td>${s.plan}</td>
 
-<td>
-<span class="status ${statusClass[s.status]}">
-${stages[s.status]}
-</span>
-</td>
+<td><span class="status ${statusClass[s.status]}">${stages[s.status]}</span></td>
 
 <td>
 
@@ -396,14 +363,9 @@ ${stages[s.status]}
 
 `
 
-})
+}
 
-apps.innerText=apps
-pending.innerText=pending
-installed.innerText=installed
-total.innerText=total
-weekly.innerText=weekly
-monthly.innerText=monthly
+})
 
 for(let a in agents){
 
@@ -419,11 +381,16 @@ leader.innerHTML+=`
 
 }
 
+document.getElementById("apps").innerText=apps
+document.getElementById("pending").innerText=pending
+document.getElementById("installed").innerText=installed
+document.getElementById("total").innerText=total
+document.getElementById("weekly").innerText=weekly
+document.getElementById("monthly").innerText=monthly
+
 drawChart(apps,pending,installed)
 
 }
-
-/* CHART */
 
 function drawChart(a,p,i){
 
@@ -445,11 +412,9 @@ backgroundColor:["#6a11cb","#ff9800","#4caf50"]
 
 }
 
-/* INSTALLER SCHEDULE */
-
 function renderSchedule(){
 
-let subs=JSON.parse(localStorage.getItem("subs")||"[]")
+let subs=getSubs()
 
 let table=document.getElementById("scheduleTable")
 
@@ -503,17 +468,12 @@ ${s.installer
 
 }
 
-/* SAVE SCHEDULE */
-
 function saveSchedule(i){
 
-let subs=JSON.parse(localStorage.getItem("subs")||"[]")
+let subs=getSubs()
 
-let installer=document.getElementById("installer"+i).value
-let date=document.getElementById("date"+i).value
-
-subs[i].installer=installer
-subs[i].installationDate=date
+subs[i].installer=document.getElementById("installer"+i).value
+subs[i].installationDate=document.getElementById("date"+i).value
 
 localStorage.setItem("subs",JSON.stringify(subs))
 
@@ -521,11 +481,9 @@ renderSchedule()
 
 }
 
-/* CHANGE TEAM */
-
 function changeTeam(i){
 
-let subs=JSON.parse(localStorage.getItem("subs")||"[]")
+let subs=getSubs()
 
 subs[i].installer=""
 
@@ -535,11 +493,9 @@ renderSchedule()
 
 }
 
-/* DAILY JOBS */
-
 function renderJobs(){
 
-let subs=JSON.parse(localStorage.getItem("subs")||"[]")
+let subs=getSubs()
 
 let table=document.getElementById("jobTable")
 
@@ -572,14 +528,12 @@ table.innerHTML+=`
 }
 
 function logout(){
-
 window.location="index.html"
-
 }
 
 render()
 
-setInterval(render,3000)
+setInterval(render,2000)
 
 </script>
 
