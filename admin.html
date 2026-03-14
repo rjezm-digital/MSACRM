@@ -4,32 +4,34 @@
 
 <title>Admin Panel</title>
 
-<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
-<link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster/dist/MarkerCluster.css"/>
-
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-<script src="https://unpkg.com/leaflet.markercluster/dist/leaflet.markercluster.js"></script>
-
 <style>
 
 body{
 margin:0;
 font-family:Arial;
 display:flex;
+background:#eef1f7;
 }
 
 .sidebar{
-width:250px;
-background:linear-gradient(180deg,#6a5acd,#4a6cf7);
+width:220px;
+background:#26324a;
 color:white;
 padding:20px;
 height:100vh;
 }
 
+.sidebar button{
+width:100%;
+margin:8px 0;
+padding:10px;
+background:#3a4a6a;
+border:none;
+color:white;
+}
+
 .main{
 flex:1;
-background:#eef1f7;
 padding:30px;
 }
 
@@ -37,22 +39,39 @@ padding:30px;
 display:grid;
 grid-template-columns:repeat(3,1fr);
 gap:20px;
+margin-bottom:30px;
 }
 
 .card{
-background:white;
 padding:20px;
 border-radius:10px;
+color:white;
 }
 
-#map{
-height:450px;
-margin-top:20px;
-border-radius:10px;
+.c1{background:#6a11cb}
+.c2{background:#ff9800}
+.c3{background:#4caf50}
+.c4{background:#ff5e62}
+.c5{background:#00bcd4}
+.c6{background:#795548}
+
+table{
+width:100%;
+background:white;
+border-collapse:collapse;
+}
+
+th{
+background:#4a6cf7;
+color:white;
+}
+
+th,td{
+padding:10px;
+border-bottom:1px solid #eee;
 }
 
 </style>
-
 </head>
 
 <body>
@@ -61,32 +80,58 @@ border-radius:10px;
 
 <h2>Admin Panel</h2>
 
+<button onclick="show('monitor')">Monitoring</button>
+<button onclick="show('subs')">Subscribers</button>
+<button onclick="show('map')">Map</button>
 <button onclick="logout()">Logout</button>
 
 </div>
 
 <div class="main">
 
-<h2>Monitoring</h2>
+<div id="monitor">
+
+<h2>Sales Monitoring</h2>
 
 <div class="cards">
 
-<div class="card">Applications <br><span id="apps">0</span></div>
-<div class="card">Pending <br><span id="pending">0</span></div>
-<div class="card">Installed <br><span id="installed">0</span></div>
-<div class="card">For Installation <br><span id="install">0</span></div>
-<div class="card">Total Commission <br><span id="total">0</span></div>
-<div class="card">Weekly Commission <br><span id="weekly">0</span></div>
+<div class="card c1">Applications<br><span id="apps"></span></div>
+<div class="card c2">Pending<br><span id="pending"></span></div>
+<div class="card c3">Installed<br><span id="installed"></span></div>
+<div class="card c4">Total Earnings<br>₱<span id="total"></span></div>
+<div class="card c5">Weekly Earnings<br>₱<span id="weekly"></span></div>
+<div class="card c6">Monthly Earnings<br>₱<span id="monthly"></span></div>
 
 </div>
 
-<h3>Agent Leaderboard</h3>
+</div>
 
-<canvas id="chart"></canvas>
+<div id="subs" style="display:none">
 
-<h3>Global Subscriber Map</h3>
+<h2>Subscribers</h2>
 
-<div id="map"></div>
+<table>
+
+<tr>
+<th>Agent</th>
+<th>Name</th>
+<th>Plan</th>
+<th>Status</th>
+</tr>
+
+<tbody id="table"></tbody>
+
+</table>
+
+</div>
+
+<div id="map" style="display:none">
+
+<h2>Global Map</h2>
+
+<p>(Map system can be connected to your KMZ fiber map viewer)</p>
+
+</div>
 
 </div>
 
@@ -94,48 +139,43 @@ border-radius:10px;
 
 let subs=JSON.parse(localStorage.getItem("subs")||"[]")
 
-let map=L.map('map').setView([9.7,124],10)
+let stages=["Applied","OMD","Pending","Approved","For Installation","Installed"]
 
-L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map)
+function show(id){
+monitor.style.display="none"
+subs.style.display="none"
+map.style.display="none"
+document.getElementById(id).style.display="block"
+}
 
-let cluster=L.markerClusterGroup()
+function render(){
 
-let agents={}
+table.innerHTML=""
 
 subs.forEach(s=>{
 
-if(!agents[s.agent]) agents[s.agent]=0
+table.innerHTML+=`
 
-if(s.status==5) agents[s.agent]++
+<tr>
 
-if(s.lat && s.lng){
+<td>${s.agent}</td>
+<td>${s.name}</td>
+<td>${s.plan}</td>
+<td>${stages[s.status]}</td>
 
-cluster.addLayer(
-L.marker([s.lat,s.lng]).bindPopup(s.name)
-)
+</tr>
 
-}
-
-})
-
-map.addLayer(cluster)
-
-new Chart(document.getElementById("chart"),{
-
-type:'bar',
-data:{
-labels:Object.keys(agents),
-datasets:[{
-label:'Installs',
-data:Object.values(agents)
-}]
-}
+`
 
 })
+
+}
 
 function logout(){
-window.location="index.html"
+location="index.html"
 }
+
+render()
 
 </script>
 
