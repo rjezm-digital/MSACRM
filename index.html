@@ -2,52 +2,48 @@
 <html>
 <head>
 
-<title>FiberAgent CRM</title>
+<title>Fiber CRM Login</title>
 
 <style>
 
 body{
-margin:0;
 font-family:Arial;
-background:linear-gradient(135deg,#6a5acd,#4a6cf7);
-height:100vh;
+background:#eef1f7;
 display:flex;
 justify-content:center;
 align-items:center;
+height:100vh;
 }
 
-.login{
+.box{
 background:white;
-padding:40px;
+padding:30px;
 border-radius:10px;
-width:320px;
-box-shadow:0 10px 30px rgba(0,0,0,.2);
-}
-
-.login h2{
-text-align:center;
+width:340px;
 }
 
 input{
 width:100%;
-padding:12px;
-margin:10px 0;
-border:1px solid #ccc;
-border-radius:6px;
+padding:10px;
+margin:8px 0;
 }
 
 button{
+padding:10px;
 width:100%;
-padding:12px;
-background:#4a6cff;
 border:none;
+background:#4e6cff;
 color:white;
 border-radius:6px;
 cursor:pointer;
 }
 
-button:hover{
-background:#374fd6;
+.section{
+margin-bottom:20px;
+}
+
+h3{
+margin-bottom:5px;
 }
 
 </style>
@@ -55,73 +51,144 @@ background:#374fd6;
 
 <body>
 
-<div class="login">
+<div class="box">
 
-<h2>FiberAgent CRM</h2>
+<h2>Fiber CRM</h2>
 
-<input id="user" placeholder="Username">
-<input id="pass" type="password" placeholder="Password">
+<!-- AGENT LOGIN -->
 
-<button onclick="login()">Login</button>
+<div class="section">
+
+<h3>Agent Login</h3>
+
+<input id="agentUser" placeholder="Agent Username">
+
+<input id="agentPass" type="password" placeholder="Password">
+
+<button onclick="loginAgent()">Login Agent</button>
 
 </div>
 
+
+<!-- ADMIN LOGIN -->
+
+<div class="section">
+
+<h3>Admin Login</h3>
+
+<input id="adminUser" placeholder="Admin Username">
+
+<input id="adminPass" type="password" placeholder="Password">
+
+<button onclick="loginAdmin()">Login Admin</button>
+
+</div>
+
+
+<!-- INSTALLER LOGIN -->
+
+<div class="section">
+
+<h3>Installer Team Login</h3>
+
+<input id="installerUser" placeholder="Team Name (TeamA / TeamB / TeamC)">
+
+<input id="installerPass" type="password" placeholder="Password">
+
+<button onclick="loginInstaller()">Login Installer</button>
+
+</div>
+
+</div>
+
+
 <script>
-
-/* USER DATABASE */
-
-const users={
-
-agent1:{pass:"1234",role:"agent"},
-agent2:{pass:"1234",role:"agent"},
-
-admin:{pass:"admin123",role:"admin"},
-
-installer1:{pass:"1111",role:"installer"},
-installer2:{pass:"1111",role:"installer"}
-
-}
-
-/* LOGIN FUNCTION */
-
-function login(){
-
-let u=document.getElementById("user").value
-let p=document.getElementById("pass").value
-
-if(users[u] && users[u].pass===p){
-
-let role=users[u].role
 
 /* AGENT LOGIN */
 
-if(role==="agent"){
+function loginAgent(){
+
+let u=document.getElementById("agentUser").value
+let p=document.getElementById("agentPass").value
+
+if(p==="1234"){
 
 localStorage.setItem("agent",u)
+
 window.location="agent.html"
 
 }
 
+else{
+
+alert("Invalid agent password")
+
+}
+
+}
+
+
 /* ADMIN LOGIN */
 
-if(role==="admin"){
+function loginAdmin(){
+
+let u=document.getElementById("adminUser").value
+let p=document.getElementById("adminPass").value
+
+if(u==="admin" && p==="admin123"){
 
 window.location="admin.html"
 
 }
 
+else{
+
+alert("Invalid admin login")
+
+}
+
+}
+
+
 /* INSTALLER LOGIN */
 
-if(role==="installer"){
+function loginInstaller(){
 
-localStorage.setItem("installer",u)
+let u=document.getElementById("installerUser").value
+let p=document.getElementById("installerPass").value
+
+if(p!=="1234"){
+
+alert("Invalid installer password")
+
+return
+
+}
+
+if(u==="TeamA"){
+
+localStorage.setItem("installerTeam","Team A")
 window.location="installer.html"
 
 }
 
-}else{
+else if(u==="TeamB"){
 
-alert("Invalid login")
+localStorage.setItem("installerTeam","Team B")
+window.location="installer.html"
+
+}
+
+else if(u==="TeamC"){
+
+localStorage.setItem("installerTeam","Team C")
+window.location="installer.html"
+
+}
+
+else{
+
+alert("Installer team not recognized")
 
 }
 

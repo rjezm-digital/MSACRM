@@ -66,8 +66,8 @@ font-size:18px;
 }
 
 .blue{background:#2196f3}
-.green{background:#4caf50}
 .orange{background:#ff9800}
+.green{background:#4caf50}
 
 /* TABLE */
 
@@ -89,7 +89,7 @@ border-bottom:1px solid #eee;
 text-align:center;
 }
 
-button.install{
+.install{
 background:#4caf50;
 border:none;
 padding:8px 12px;
@@ -99,7 +99,6 @@ cursor:pointer;
 }
 
 </style>
-
 </head>
 
 <body>
@@ -108,12 +107,15 @@ cursor:pointer;
 
 <h2>Installer Panel</h2>
 
+<h3 id="teamName"></h3>
+
 <button onclick="showPage('dashboard')">Dashboard</button>
-<button onclick="showPage('jobs')">Today's Jobs</button>
+<button onclick="showPage('jobs')">Installation Jobs</button>
 
 <button class="logout" onclick="logout()">Logout</button>
 
 </div>
+
 
 <div class="main">
 
@@ -126,17 +128,17 @@ cursor:pointer;
 <div class="cards">
 
 <div class="card blue">
-Total Jobs Today<br>
+Total Jobs<br>
 <span id="totalJobs">0</span>
 </div>
 
 <div class="card orange">
-Pending Installations<br>
+Pending Jobs<br>
 <span id="pendingJobs">0</span>
 </div>
 
 <div class="card green">
-Completed Today<br>
+Completed<br>
 <span id="doneJobs">0</span>
 </div>
 
@@ -144,11 +146,12 @@ Completed Today<br>
 
 </div>
 
-<!-- JOB LIST -->
+
+<!-- JOBS -->
 
 <div id="jobs" style="display:none">
 
-<h2>Today's Installation Jobs</h2>
+<h2>Installation Jobs</h2>
 
 <table>
 
@@ -169,7 +172,15 @@ Completed Today<br>
 
 </div>
 
+
 <script>
+
+/* GET TEAM */
+
+let team = localStorage.getItem("installerTeam")
+
+document.getElementById("teamName").innerText="Team: "+team
+
 
 /* PAGE SWITCH */
 
@@ -182,11 +193,12 @@ document.getElementById(p).style.display="block"
 
 }
 
-/* GET DATA */
+
+/* GET DATABASE */
 
 function getSubs(){
 
-let data = localStorage.getItem("subs")
+let data=localStorage.getItem("subs")
 
 if(!data) return []
 
@@ -194,7 +206,8 @@ return JSON.parse(data)
 
 }
 
-/* INSTALL COMPLETE */
+
+/* MARK INSTALLED */
 
 function markInstalled(i){
 
@@ -208,13 +221,12 @@ render()
 
 }
 
-/* MAIN RENDER */
+
+/* RENDER */
 
 function render(){
 
 let subs=getSubs()
-
-let today=new Date().toISOString().split("T")[0]
 
 let table=document.getElementById("jobTable")
 
@@ -226,12 +238,11 @@ let done=0
 
 subs.forEach((s,i)=>{
 
-if(s.installationDate==today){
+if(s.installer===team){
 
 total++
 
 if(s.status!=5) pending++
-
 if(s.status==5) done++
 
 table.innerHTML+=`
@@ -241,8 +252,8 @@ table.innerHTML+=`
 <td>${s.name}</td>
 <td>${s.plan}</td>
 <td>${s.agent}</td>
-<td>${s.installer || "-"}</td>
-<td>${s.installationDate}</td>
+<td>${s.installer}</td>
+<td>${s.installationDate || "-"}</td>
 
 <td>
 
@@ -267,9 +278,17 @@ document.getElementById("doneJobs").innerText=done
 
 }
 
+
+/* LOGOUT */
+
 function logout(){
+
+localStorage.removeItem("installerTeam")
+
 window.location="index.html"
+
 }
+
 
 /* AUTO SYNC */
 
