@@ -14,8 +14,8 @@ background:#eef1f7;
 }
 
 .sidebar{
-width:220px;
-background:#26324a;
+width:230px;
+background:#25324a;
 color:white;
 padding:20px;
 height:100vh;
@@ -29,6 +29,7 @@ background:#3a4a6a;
 border:none;
 color:white;
 border-radius:6px;
+cursor:pointer;
 }
 
 .main{
@@ -62,11 +63,11 @@ padding:10px;
 margin:6px 0;
 }
 
-.subcard{
+.sub{
 background:white;
 padding:15px;
-margin:10px 0;
 border-radius:8px;
+margin:10px 0;
 }
 
 </style>
@@ -78,32 +79,33 @@ border-radius:8px;
 
 <h2>Agent Panel</h2>
 
-<button onclick="show('monitor')">Monitoring</button>
-<button onclick="show('add')">Subscribers</button>
+<button onclick="showPage('monitor')">Monitoring</button>
+<button onclick="showPage('add')">Add Subscriber</button>
+
 <button onclick="logout()">Logout</button>
 
 </div>
 
 <div class="main">
 
-<div id="monitor">
+<div id="monitorPage">
 
 <h2>Sales Monitoring</h2>
 
 <div class="cards">
 
-<div class="card c1">Applications<br><span id="apps">0</span></div>
-<div class="card c2">Pending<br><span id="pending">0</span></div>
-<div class="card c3">Installed<br><span id="installed">0</span></div>
-<div class="card c4">Total Earnings<br>₱<span id="total">0</span></div>
-<div class="card c5">Weekly Earnings<br>₱<span id="weekly">0</span></div>
-<div class="card c6">Monthly Earnings<br>₱<span id="monthly">0</span></div>
+<div class="card c1">Applications <br><span id="apps">0</span></div>
+<div class="card c2">Pending <br><span id="pending">0</span></div>
+<div class="card c3">Installed <br><span id="installed">0</span></div>
 
 </div>
 
+<div id="subscriberList"></div>
+
 </div>
 
-<div id="add" style="display:none">
+
+<div id="addPage" style="display:none">
 
 <h2>Add Subscriber</h2>
 
@@ -128,12 +130,9 @@ border-radius:8px;
 
 <option value="1700">FiberX 1500 + Vision</option>
 <option value="2200">FiberX 2000 + Vision</option>
-<option value="2700">FiberX 2500 + Vision</option>
 
 <option value="1699">TOD 1699</option>
 <option value="1999">TOD 1999</option>
-<option value="3000">TOD 3000</option>
-<option value="3500">TOD 3500</option>
 
 <option value="1500">FlexiBIZ 1500</option>
 <option value="2000">FlexiBIZ 2000</option>
@@ -143,9 +142,7 @@ border-radius:8px;
 
 </select>
 
-<button onclick="add()">Add Subscriber</button>
-
-<div id="list"></div>
+<button onclick="addSubscriber()">Add Subscriber</button>
 
 </div>
 
@@ -156,19 +153,28 @@ border-radius:8px;
 let agent=localStorage.getItem("agent")
 let subs=JSON.parse(localStorage.getItem("subs")||"[]")
 
-let stages=["Applied","OMD","Pending","Approved","For Installation","Installed"]
+const stages=["Applied","OMD","Pending","Approved","For Installation","Installed"]
 
-function show(id){
-monitor.style.display="none"
-add.style.display="none"
-document.getElementById(id).style.display="block"
+function showPage(page){
+
+document.getElementById("monitorPage").style.display="none"
+document.getElementById("addPage").style.display="none"
+
+if(page==="monitor"){
+document.getElementById("monitorPage").style.display="block"
+}
+
+if(page==="add"){
+document.getElementById("addPage").style.display="block"
+}
+
 }
 
 function save(){
 localStorage.setItem("subs",JSON.stringify(subs))
 }
 
-function add(){
+function addSubscriber(){
 
 subs.push({
 agent:agent,
@@ -178,9 +184,8 @@ phone:phone.value,
 code:code.value,
 lat:lat.value,
 lng:lng.value,
-plan:parseInt(plan.value),
-status:0,
-date:new Date()
+plan:plan.value,
+status:0
 })
 
 save()
@@ -188,35 +193,54 @@ render()
 
 }
 
-function next(i){
-if(subs[i].status<5) subs[i].status++
+function nextStatus(i){
+
+if(subs[i].status<5){
+subs[i].status++
 save()
 render()
 }
 
+}
+
 function render(){
 
+let list=document.getElementById("subscriberList")
 list.innerHTML=""
+
+let apps=0
+let pending=0
+let installed=0
 
 subs.forEach((s,i)=>{
 
 if(s.agent!==agent) return
 
+apps++
+
+if(stages[s.status]=="Pending") pending++
+if(stages[s.status]=="Installed") installed++
+
 list.innerHTML+=`
 
-<div class="subcard">
+<div class="sub">
 
 <b>${s.name}</b><br>
+
 Plan: ${s.plan}<br>
 Status: ${stages[s.status]}<br>
 
-<button onclick="next(${i})">Next</button>
+<button onclick="nextStatus(${i})">Next Status</button>
 
 </div>
 
 `
 
 })
+
+apps.innerText=apps
+pending.innerText=pending
+installed.innerText=installed
 
 }
 
