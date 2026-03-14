@@ -21,6 +21,8 @@ display:flex;
 background:#eef1f7;
 }
 
+/* SIDEBAR */
+
 .sidebar{
 width:240px;
 background:#25324a;
@@ -48,10 +50,14 @@ background:#4e6cff;
 background:#ff5e62!important;
 }
 
+/* MAIN */
+
 .main{
 flex:1;
 padding:30px;
 }
+
+/* CARDS */
 
 .cards{
 display:grid;
@@ -74,6 +80,24 @@ font-size:18px;
 .cyan{background:#00bcd4}
 .brown{background:#795548}
 
+/* STATUS BADGES */
+
+.status{
+padding:5px 10px;
+border-radius:6px;
+color:white;
+font-size:13px;
+}
+
+.encoded{background:#9e9e9e}
+.omd{background:#2196f3}
+.pending{background:#ff9800}
+.approved{background:#9c27b0}
+.install{background:#ffc107;color:black}
+.installed{background:#4caf50}
+
+/* CHART */
+
 .chartbox{
 background:white;
 padding:20px;
@@ -81,6 +105,8 @@ border-radius:10px;
 width:420px;
 margin-bottom:30px;
 }
+
+/* TABLE */
 
 table{
 width:100%;
@@ -105,6 +131,8 @@ padding:10px;
 width:300px;
 margin-bottom:10px;
 }
+
+/* MAP */
 
 #map{
 height:450px;
@@ -229,7 +257,7 @@ border-radius:10px;
 
 </div>
 
-<!-- INSTALLER DAILY JOBS -->
+<!-- DAILY JOBS -->
 
 <div id="jobs" style="display:none">
 
@@ -276,6 +304,15 @@ const stages=[
 "Installed"
 ]
 
+const statusClass=[
+"encoded",
+"omd",
+"pending",
+"approved",
+"install",
+"installed"
+]
+
 let chart
 let mapLoaded=false
 
@@ -302,7 +339,7 @@ mapLoaded=true
 
 function updateStatus(i,val){
 
-let subs = JSON.parse(localStorage.getItem("subs")||"[]")
+let subs=JSON.parse(localStorage.getItem("subs")||"[]")
 
 subs[i].status=parseInt(val)
 
@@ -314,7 +351,7 @@ render()
 
 function render(){
 
-let subs = JSON.parse(localStorage.getItem("subs")||"[]")
+let subs=JSON.parse(localStorage.getItem("subs")||"[]")
 
 let table=document.getElementById("table")
 let leader=document.getElementById("leaderTable")
@@ -365,18 +402,22 @@ table.innerHTML+=`
 <td>${s.name}</td>
 <td>${s.plan}</td>
 
-<td>${stages[s.status]}</td>
+<td>
+<span class="status ${statusClass[s.status]}">
+${stages[s.status]}
+</span>
+</td>
 
 <td>
 
 <select onchange="updateStatus(${i},this.value)">
 
-<option value="0">Encoded</option>
-<option value="1">OMD</option>
-<option value="2">Pending</option>
-<option value="3">Approved</option>
-<option value="4">For Installation</option>
-<option value="5">Installed</option>
+<option value="0" ${s.status==0?"selected":""}>Encoded</option>
+<option value="1" ${s.status==1?"selected":""}>OMD</option>
+<option value="2" ${s.status==2?"selected":""}>Pending</option>
+<option value="3" ${s.status==3?"selected":""}>Approved</option>
+<option value="4" ${s.status==4?"selected":""}>For Installation</option>
+<option value="5" ${s.status==5?"selected":""}>Installed</option>
 
 </select>
 
@@ -433,136 +474,8 @@ backgroundColor:["#6a11cb","#ff9800","#4caf50"]
 
 }
 
-function renderSchedule(){
-
-let subs = JSON.parse(localStorage.getItem("subs")||"[]")
-
-let table=document.getElementById("scheduleTable")
-table.innerHTML=""
-
-subs.forEach((s,i)=>{
-
-if(stages[s.status]=="For Installation"){
-
-table.innerHTML+=`
-
-<tr>
-
-<td>${s.name}</td>
-<td>${s.agent}</td>
-<td>${s.plan}</td>
-
-<td>
-
-<select id="installer${i}">
-<option>Team A</option>
-<option>Team B</option>
-<option>Team C</option>
-</select>
-
-</td>
-
-<td>
-
-<input type="date" id="date${i}">
-
-</td>
-
-<td>
-
-<button onclick="saveSchedule(${i})">Save</button>
-
-</td>
-
-</tr>
-
-`
-
-}
-
-})
-
-}
-
-function saveSchedule(i){
-
-let subs = JSON.parse(localStorage.getItem("subs")||"[]")
-
-let installer=document.getElementById("installer"+i).value
-let date=document.getElementById("date"+i).value
-
-subs[i].installer=installer
-subs[i].installationDate=date
-
-localStorage.setItem("subs",JSON.stringify(subs))
-
-alert("Schedule saved")
-
-}
-
-function renderJobs(){
-
-let subs = JSON.parse(localStorage.getItem("subs")||"[]")
-
-let table=document.getElementById("jobTable")
-table.innerHTML=""
-
-let today=new Date().toISOString().split("T")[0]
-
-subs.forEach(s=>{
-
-if(s.installationDate==today){
-
-table.innerHTML+=`
-
-<tr>
-
-<td>${s.installationDate}</td>
-<td>${s.name}</td>
-<td>${s.plan}</td>
-<td>${s.installer}</td>
-<td>${s.agent}</td>
-
-</tr>
-
-`
-
-}
-
-})
-
-}
-
-function loadMap(){
-
-let subs = JSON.parse(localStorage.getItem("subs")||"[]")
-
-let map=L.map('map').setView([9.7,124],10)
-
-L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map)
-
-let cluster=L.markerClusterGroup()
-
-subs.forEach(s=>{
-
-if(s.lat && s.lng){
-
-cluster.addLayer(
-L.marker([s.lat,s.lng]).bindPopup(s.name)
-)
-
-}
-
-})
-
-map.addLayer(cluster)
-
-}
-
 function logout(){
-
 window.location="index.html"
-
 }
 
 render()
