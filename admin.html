@@ -6,9 +6,14 @@
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
-<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+<link rel="stylesheet"
+href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
 
-<link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.css"/>
+<link rel="stylesheet"
+href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.css"/>
+
+<link rel="stylesheet"
+href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.Default.css"/>
 
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
@@ -187,6 +192,7 @@ Monthly Commission<br>
 
 </div>
 
+
 <!-- AGENT PERFORMANCE -->
 
 <div id="agents" style="display:none">
@@ -198,6 +204,7 @@ Monthly Commission<br>
 </div>
 
 </div>
+
 
 <!-- SUBSCRIBERS -->
 
@@ -223,6 +230,7 @@ Monthly Commission<br>
 
 </div>
 
+
 <!-- INSTALLER SCHEDULING -->
 
 <div id="schedule" style="display:none">
@@ -239,6 +247,7 @@ Monthly Commission<br>
 <th>Agent</th>
 <th>Installer</th>
 <th>Date</th>
+<th>Action</th>
 </tr>
 
 <tbody id="scheduleTable"></tbody>
@@ -247,7 +256,8 @@ Monthly Commission<br>
 
 </div>
 
-<!-- INSTALLER DAILY JOBS -->
+
+<!-- INSTALLER JOBS -->
 
 <div id="jobs" style="display:none">
 
@@ -263,7 +273,7 @@ Monthly Commission<br>
 <th>Agent</th>
 <th>Installer</th>
 <th>Date</th>
-<th>Action</th>
+<th>Confirm</th>
 </tr>
 
 <tbody id="jobsTable"></tbody>
@@ -271,6 +281,7 @@ Monthly Commission<br>
 </table>
 
 </div>
+
 
 <!-- GLOBAL MAP -->
 
@@ -322,12 +333,33 @@ localStorage.setItem("subs",JSON.stringify(subs))
 
 }
 
+function saveInstaller(i){
+
+let subs=getSubs()
+
+subs[i].installer=document.getElementById("installer_"+i).value
+subs[i].installationDate=document.getElementById("date_"+i).value
+subs[i].installerLocked=true
+
+localStorage.setItem("subs",JSON.stringify(subs))
+
+}
+
+function changeTeam(i){
+
+let subs=getSubs()
+
+subs[i].installerLocked=false
+
+localStorage.setItem("subs",JSON.stringify(subs))
+
+}
+
 function confirmInstall(i){
 
 let subs=getSubs()
 
 subs[i].status=5
-
 subs[i].installedDate=new Date().toISOString()
 
 localStorage.setItem("subs",JSON.stringify(subs))
@@ -341,15 +373,13 @@ let subs=getSubs()
 let apps=0
 let pend=0
 let inst=0
-
-let totalCommission=0
+let commission=0
 let weekly=0
 let monthly=0
 
 let agents={}
 
 let now=new Date()
-
 let weekAgo=new Date()
 weekAgo.setDate(now.getDate()-7)
 
@@ -365,18 +395,13 @@ inst++
 
 let c=(s.plan/2)-50
 
-totalCommission+=c
+commission+=c
 
-let installDate=new Date(s.installedDate)
+let d=new Date(s.installedDate)
 
-if(installDate>=weekAgo) weekly+=c
+if(d>=weekAgo) weekly+=c
 
-if(
-installDate.getMonth()==now.getMonth() &&
-installDate.getFullYear()==now.getFullYear()
-){
-monthly+=c
-}
+if(d.getMonth()==now.getMonth()) monthly+=c
 
 if(!agents[s.agent]) agents[s.agent]=0
 agents[s.agent]++
@@ -388,7 +413,7 @@ agents[s.agent]++
 document.getElementById("applications").innerText=apps
 document.getElementById("pending").innerText=pend
 document.getElementById("installed").innerText=inst
-document.getElementById("commission").innerText=totalCommission
+document.getElementById("commission").innerText=commission
 document.getElementById("weekly").innerText=weekly
 document.getElementById("monthly").innerText=monthly
 
@@ -454,21 +479,41 @@ schedule+=`
 
 <td>
 
-<select onchange="setInstaller(${i},this.value)">
+${s.installerLocked ?
 
+s.installer :
+
+`<select id="installer_${i}">
 <option>Team A</option>
 <option>Team B</option>
 <option>Team C</option>
+</select>`
 
-</select>
+}
 
 </td>
 
 <td>
 
-<input type="date"
-value="${s.installationDate || ""}"
-onchange="setDate(${i},this.value)">
+${s.installerLocked ?
+
+s.installationDate :
+
+`<input type="date" id="date_${i}">`
+
+}
+
+</td>
+
+<td>
+
+${s.installerLocked ?
+
+`<button onclick="changeTeam(${i})">Change Team</button>` :
+
+`<button onclick="saveInstaller(${i})">Save</button>`
+
+}
 
 </td>
 
@@ -494,8 +539,8 @@ jobs+=`
 
 <td>
 
-${s.status==5?"Completed":
-`<button onclick="confirmInstall(${i})">Confirm Installed</button>`}
+${s.status==5 ? "Completed" :
+`<button onclick="confirmInstall(${i})">Confirm</button>`}
 
 </td>
 
@@ -605,24 +650,6 @@ cluster.addLayer(marker)
 }
 
 })
-
-}
-
-function setInstaller(i,val){
-
-let subs=getSubs()
-subs[i].installer=val
-
-localStorage.setItem("subs",JSON.stringify(subs))
-
-}
-
-function setDate(i,val){
-
-let subs=getSubs()
-subs[i].installationDate=val
-
-localStorage.setItem("subs",JSON.stringify(subs))
 
 }
 
