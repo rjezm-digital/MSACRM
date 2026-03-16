@@ -567,6 +567,7 @@ if(s.status==STATUS.FOR_INSTALL){
 
 schedule+=`
 <tr>
+
 <td>${s.name}</td>
 <td>${s.phone}</td>
 <td>${s.address}</td>
@@ -574,19 +575,31 @@ schedule+=`
 <td>${s.agent}</td>
 
 <td>
-<select id="installer_${s.code}">
-<option>Team A</option>
-<option>Team B</option>
-<option>Team C</option>
-</select>
+
+${s.installerLocked ?
+s.installer :
+`<select id="installer_${s.code}">
+<option ${s.installer=="Team A"?"selected":""}>Team A</option>
+<option ${s.installer=="Team B"?"selected":""}>Team B</option>
+<option ${s.installer=="Team C"?"selected":""}>Team C</option>
+</select>`}
+
 </td>
 
 <td>
-<input type="date" id="date_${s.code}">
+
+${s.installerLocked ?
+s.installationDate :
+`<input type="date" id="date_${s.code}">`}
+
 </td>
 
 <td>
-<button onclick="saveInstaller('${s.code}')">Save</button>
+
+${s.installerLocked ?
+`<button onclick="changeTeam('${s.code}')">Change Team</button>` :
+`<button onclick="saveInstaller('${s.code}')">Save</button>`}
+
 </td>
 
 </tr>
