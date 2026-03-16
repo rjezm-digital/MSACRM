@@ -220,10 +220,6 @@ Monthly Commission<br>
 
 </div>
 
-<!-- FIXED SUBSCRIBER CONTAINER -->
-
-<div id="subs" style="display:none">
-
 <h2>Subscribers</h2>
 
 <table>
@@ -355,7 +351,6 @@ subs[i].status=parseInt(val)
 saveSubs(subs)
 
 render()
-updateMap()
 
 }
 
@@ -411,7 +406,6 @@ subs[i].installedDate=new Date().toISOString()
 saveSubs(subs)
 
 render()
-updateMap()
 
 }
 
@@ -446,7 +440,7 @@ let c=(s.plan/2)-50
 
 commission+=c
 
-let d=new Date(s.installedDate)
+let d=new Date(s.installedDate || new Date())
 
 if(d>=weekAgo) weekly+=c
 
@@ -459,17 +453,19 @@ agents[s.agent]++
 
 })
 
-applications.innerText=apps
-pending.innerText=pend
-installed.innerText=inst
-commission.innerText=commission
-weekly.innerText=weekly
-monthly.innerText=monthly
+document.getElementById("applications").innerText=apps
+document.getElementById("pending").innerText=pend
+document.getElementById("installed").innerText=inst
+document.getElementById("commission").innerText=commission
+document.getElementById("weekly").innerText=weekly
+document.getElementById("monthly").innerText=monthly
 
 updateCharts(apps,pend,inst,agents)
 renderAgentTable(agents)
-
 renderTables()
+
+/* ADDED: ensure map always updates */
+updateMap()
 
 }
 
@@ -512,7 +508,102 @@ html+=`
 
 })
 
+/* ADDED SAFE CHECK */
+if(document.getElementById("agentTable")){
 document.getElementById("agentTable").innerHTML=html
+}
+
+}
+
+function renderTables(){
+
+let subs=getSubs()
+
+let table=""
+let schedule=""
+let jobs=""
+
+subs.forEach(s=>{
+
+table+=`
+<tr>
+<td>${s.name}</td>
+<td>${s.phone}</td>
+<td>${s.address}</td>
+<td>${s.plan}</td>
+
+<td>
+<select onchange="setStatus('${s.code}',this.value)">
+<option value="0" ${s.status==0?"selected":""}>Encoded</option>
+<option value="1" ${s.status==1?"selected":""}>OMD</option>
+<option value="2" ${s.status==2?"selected":""}>Pending</option>
+<option value="3" ${s.status==3?"selected":""}>Approved</option>
+<option value="4" ${s.status==4?"selected":""}>For Installation</option>
+</select>
+</td>
+
+<td>${s.agent}</td>
+<td>${s.code}</td>
+</tr>
+`
+
+if(s.status==STATUS.FOR_INSTALL){
+
+schedule+=`
+<tr>
+<td>${s.name}</td>
+<td>${s.phone}</td>
+<td>${s.address}</td>
+<td>${s.plan}</td>
+<td>${s.agent}</td>
+
+<td>
+<select id="installer_${s.code}">
+<option>Team A</option>
+<option>Team B</option>
+<option>Team C</option>
+</select>
+</td>
+
+<td>
+<input type="date" id="date_${s.code}">
+</td>
+
+<td>
+<button onclick="saveInstaller('${s.code}')">Save</button>
+</td>
+
+</tr>
+`
+}
+
+if(s.installationDate){
+
+jobs+=`
+<tr>
+<td>${s.name}</td>
+<td>${s.phone}</td>
+<td>${s.address}</td>
+<td>${s.plan}</td>
+<td>${s.agent}</td>
+<td>${s.installer}</td>
+<td>${s.installationDate}</td>
+
+<td>
+${s.status==STATUS.INSTALLED
+?"Installed"
+:`<button onclick="confirmInstall('${s.code}')">Confirm</button>`}
+</td>
+
+</tr>
+`
+}
+
+})
+
+document.getElementById("subTable").innerHTML=table
+document.getElementById("scheduleTable").innerHTML=schedule
+document.getElementById("jobsTable").innerHTML=jobs
 
 }
 
@@ -539,18 +630,29 @@ cutout:"60%"
 
 if(agentChart) agentChart.destroy()
 
+/* ADDED SAFE HANDLING */
+let labels=Object.keys(agents)
+let values=Object.values(agents)
+
+if(labels.length===0){
+labels=["No Data"]
+values=[0]
+}
+
 agentChart=new Chart(
 document.getElementById("agentChart"),
 {
 type:"bar",
 data:{
-labels:Object.keys(agents),
+labels:labels,
 datasets:[{
-data:Object.values(agents),
+data:values,
 backgroundColor:"#00acc1"
 }]
 },
-options:{plugins:{legend:{display:false}}}
+options:{
+plugins:{legend:{display:false}}
+}
 })
 
 }
@@ -586,14 +688,11 @@ if(s.lat && s.long){
 let marker=L.marker([s.lat,s.long])
 
 marker.bindPopup(
-
 "<b>"+s.name+"</b><br>"+
 "📞 "+s.phone+"<br>"+
 "📍 "+s.address+"<br>"+
 "Plan: "+s.plan+"<br>"+
-"Agent: "+s.agent+"<br>"+
-"<a target='_blank' href='https://maps.google.com/?q="+s.lat+","+s.long+"'>Navigate</a>"
-
+"Agent: "+s.agent
 )
 
 cluster.addLayer(marker)
@@ -604,23 +703,15 @@ cluster.addLayer(marker)
 
 }
 
+render()
+
+setInterval(render,2000)
+
 function logout(){
-
 localStorage.removeItem("admin")
-window.location="index.html"
-
+location="index.html"
 }
-
-render()
-
-setInterval(()=>{
-if(document.getElementById("schedule").style.display!=="block"){
-render()
-updateMap()
-}
-},2000)
 
 </script>
-
 </body>
 </html>
