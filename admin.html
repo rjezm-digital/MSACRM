@@ -721,7 +721,12 @@ cluster.addLayer(marker)
 
 render()
 
-setInterval(render,2000)
+setInterval(()=>{
+if(document.getElementById("schedule").style.display!=="block"){
+render()
+updateMap()
+}
+},2000)
 
 function logout(){
 localStorage.removeItem("admin")
