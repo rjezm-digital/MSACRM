@@ -377,21 +377,13 @@ function installerDone(code){
 let subs=getSubs()
 let i=findSub(code)
 
-subs[i].status=STATUS.INSTALL_DONE
-
-saveSubs(subs)
-
-}
-
-function confirmInstall(code){
-
-let subs=getSubs()
-let i=findSub(code)
-
 subs[i].status=STATUS.INSTALLED
 subs[i].installedDate=new Date().toISOString()
 
 saveSubs(subs)
+
+render()
+updateMap()
 
 }
 
@@ -418,7 +410,7 @@ apps++
 
 if(s.status==STATUS.PENDING) pend++
 
-if(s.status==STATUS.INSTALLED){
+ifif(s.status>=STATUS.INSTALL_DONE){
 
 inst++
 
