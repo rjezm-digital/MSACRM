@@ -198,8 +198,29 @@ Monthly Commission<br>
 </div>
 
 <div id="agents" style="display:none">
+
 <h2>Agent Performance</h2>
+
+<div class="chart-box">
+<canvas id="agentChart"></canvas>
 </div>
+
+<table>
+
+<tr>
+<th>Agent</th>
+<th>Applications</th>
+<th>Installed</th>
+<th>Commission</th>
+</tr>
+
+<tbody id="agentTable"></tbody>
+
+</table>
+
+</div>
+
+<!-- FIXED SUBSCRIBER CONTAINER -->
 
 <div id="subs" style="display:none">
 
@@ -308,24 +329,18 @@ if(p==="mapview") setTimeout(loadMap,300)
 }
 
 function getSubs(){
-
 let data=localStorage.getItem("subs")
 if(!data) return []
 return JSON.parse(data)
-
 }
 
 function saveSubs(data){
-
 localStorage.setItem("subs",JSON.stringify(data))
-
 }
 
 function findSub(code){
-
 let subs=getSubs()
 return subs.findIndex(s=>s.code===code)
-
 }
 
 function setStatus(code,val){
@@ -344,7 +359,6 @@ updateMap()
 
 }
 
-/* UPDATED FUNCTION */
 function saveInstaller(code){
 
 let subs=getSubs()
@@ -356,11 +370,10 @@ subs[i].installerLocked=true
 
 saveSubs(subs)
 
-render()   /* ADDED */
+render()
 
 }
 
-/* UPDATED FUNCTION */
 function changeTeam(code){
 
 let subs=getSubs()
@@ -370,11 +383,24 @@ subs[i].installerLocked=false
 
 saveSubs(subs)
 
-render()   /* ADDED */
+render()
 
 }
 
 function installerDone(code){
+
+let subs=getSubs()
+let i=findSub(code)
+
+subs[i].status=STATUS.INSTALL_DONE
+
+saveSubs(subs)
+
+render()
+
+}
+
+function confirmInstall(code){
 
 let subs=getSubs()
 let i=findSub(code)
@@ -441,133 +467,52 @@ weekly.innerText=weekly
 monthly.innerText=monthly
 
 updateCharts(apps,pend,inst,agents)
+renderAgentTable(agents)
 
 renderTables()
 
 }
 
-function renderTables(){
+function renderAgentTable(agents){
 
 let subs=getSubs()
+let html=""
 
-let table=""
-let schedule=""
-let jobs=""
+Object.keys(agents).forEach(agent=>{
+
+let applications=0
+let installed=0
+let commission=0
 
 subs.forEach(s=>{
 
-table+=`
+if(s.agent==agent){
 
-<tr>
+applications++
 
-<td>${s.name}</td>
-<td>${s.phone}</td>
-<td>${s.address}</td>
-<td>${s.plan}</td>
+if(s.status>=STATUS.INSTALL_DONE){
 
-<td>
-
-<select onchange="setStatus('${s.code}',this.value)" ${s.status>=STATUS.INSTALL_DONE?"disabled":""}>
-
-<option value="0" ${s.status==0?"selected":""}>Encoded</option>
-<option value="1" ${s.status==1?"selected":""}>OMD</option>
-<option value="2" ${s.status==2?"selected":""}>Pending</option>
-<option value="3" ${s.status==3?"selected":""}>Approved</option>
-<option value="4" ${s.status==4?"selected":""}>For Installation</option>
-
-</select>
-
-</td>
-
-<td>${s.agent}</td>
-
-<td>${s.code}</td>
-
-</tr>
-
-`
-
-if(s.status==STATUS.FOR_INSTALL){
-
-schedule+=`
-
-<tr>
-
-<td>${s.name}</td>
-<td>${s.phone}</td>
-<td>${s.address}</td>
-<td>${s.plan}</td>
-<td>${s.agent}</td>
-
-<td>
-
-${s.installerLocked ?
-s.installer :
-`<select id="installer_${s.code}">
-<option>Team A</option>
-<option>Team B</option>
-<option>Team C</option>
-</select>`}
-
-</td>
-
-<td>
-
-${s.installerLocked ?
-s.installationDate :
-`<input type="date" id="date_${s.code}">`}
-
-</td>
-
-<td>
-
-${s.installerLocked ?
-`<button onclick="changeTeam('${s.code}')">Change Team</button>` :
-`<button onclick="saveInstaller('${s.code}')">Save</button>`}
-
-</td>
-
-</tr>
-
-`
+installed++
+commission+=(s.plan/2)-50
 
 }
-
-if(s.installationDate){
-
-jobs+=`
-
-<tr>
-
-<td>${s.name}</td>
-<td>${s.phone}</td>
-<td>${s.address}</td>
-<td>${s.plan}</td>
-<td>${s.agent}</td>
-<td>${s.installer}</td>
-<td>${s.installationDate}</td>
-
-<td>
-
-${s.status==STATUS.INSTALL_DONE ?
-`<button onclick="confirmInstall('${s.code}')">Confirm Installed</button>` :
-s.status==STATUS.INSTALLED ?
-"Installed" :
-`<button onclick="installerDone('${s.code}')">Mark Done</button>`}
-
-</td>
-
-</tr>
-
-`
 
 }
 
 })
 
-subTable.innerHTML=table
-scheduleTable.innerHTML=schedule
-jobsTable.innerHTML=jobs
+html+=`
+<tr>
+<td>${agent}</td>
+<td>${applications}</td>
+<td>${installed}</td>
+<td>₱${commission}</td>
+</tr>
+`
+
+})
+
+document.getElementById("agentTable").innerHTML=html
 
 }
 
