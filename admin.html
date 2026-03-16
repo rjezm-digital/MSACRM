@@ -549,12 +549,14 @@ table+=`
 <td>${s.plan}</td>
 
 <td>
-<select onchange="setStatus('${s.code}',this.value)" ${s.status>=STATUS.FOR_INSTALL?"disabled":""}>
+<select onchange="setStatus('${s.code}',this.value)" ${s.status>=STATUS.INSTALLED?"disabled":""}>
 <option value="0" ${s.status==0?"selected":""}>Encoded</option>
 <option value="1" ${s.status==1?"selected":""}>OMD</option>
 <option value="2" ${s.status==2?"selected":""}>Pending</option>
 <option value="3" ${s.status==3?"selected":""}>Approved</option>
 <option value="4" ${s.status==4?"selected":""}>For Installation</option>
+<option value="5" ${s.status==5?"selected":""}>Installation Done</option>
+<option value="6" ${s.status==6?"selected":""}>Installed</option>
 </select>
 </td>
 
