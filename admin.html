@@ -382,9 +382,9 @@ let i = await findSub(code)
 
 if(i===-1) return
 
-subs[i].status=parseInt(val)
-
-saveSubs(subs)
+await db.collection("subscribers").doc(code).update({
+status: parseInt(val)
+})
 
 render()
 
