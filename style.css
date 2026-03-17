@@ -1,0 +1,64 @@
+@media (max-width:768px){
+...
+}
+
+/* MOBILE RESPONSIVE */
+@media (max-width:768px){
+
+body{
+flex-direction:column;
+}
+
+/* SIDEBAR becomes top bar */
+.sidebar{
+width:100%;
+height:auto;
+display:flex;
+flex-wrap:wrap;
+justify-content:center;
+}
+
+.sidebar h2, .sidebar h3{
+width:100%;
+text-align:center;
+}
+
+.sidebar button{
+width:48%;
+margin:5px;
+font-size:14px;
+padding:10px;
+}
+
+/* MAIN FULL WIDTH */
+.main{
+padding:15px;
+}
+
+/* CARDS STACK */
+.cards{
+grid-template-columns:1fr;
+}
+
+/* TABLE scroll */
+table{
+display:block;
+overflow-x:auto;
+white-space:nowrap;
+}
+
+/* FORM STACK */
+.form-grid{
+grid-template-columns:1fr;
+}
+
+.full{
+grid-column:auto;
+}
+
+/* MAP HEIGHT smaller */
+#map{
+height:300px;
+}
+
+}
