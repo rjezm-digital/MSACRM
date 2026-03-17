@@ -496,26 +496,6 @@ renderTables()
 
 /* ADDED: ensure map always updates */
 
-html+=`
-<tr>
-<td>${agent}</td>
-<td>${applications}</td>
-<td>${installed}</td>
-<td>₱${commission}</td>
-</tr>
-`
-
-})
-
-/* ADDED SAFE CHECK */
-if(document.getElementById("agentTable")){
-document.getElementById("agentTable").innerHTML=html
-}
-if(topAgent){
-document.getElementById("topAgent").innerHTML=
-"🏆 Top Agent: "+topAgent+" — ₱"+topCommission
-}
-
 }
 
 async function renderAgentTable(agents){
