@@ -221,24 +221,6 @@ Optimize Route
 
 <script>
 
-const firebaseConfig = {
-  apiKey: "AIzaSyBwrJprjuU4BywFapZyw_SsBcsJAYo5OPU",
-  authDomain: "convergecrm-7c237.firebaseapp.com",
-  projectId: "convergecrm-7c237",
-  storageBucket: "convergecrm-7c237.firebasestorage.app",
-  messagingSenderId: "1078658502451",
-  appId: "1:1078658502451:web:7d81a4d127d42f15eab846"
-};
-
-firebase.initializeApp(firebaseConfig);
-
-const auth = firebase.auth();
-const db = firebase.firestore();
-
-</script>
-
-<script>
-
 /* INSTALLER TEAM */
 
 let team = localStorage.getItem("installerTeam")
@@ -274,14 +256,12 @@ return subs
 
 }
 
-}
-
 
 /* ADDED: find subscriber by application code */
 
-function findIndexByCode(code){
+async function findIndexByCode(code){
 
-let subs=getSubs()
+let subs = await getSubs()
 
 return subs.findIndex(s=>s.code===code || s.appcode===code)
 
@@ -290,13 +270,19 @@ return subs.findIndex(s=>s.code===code || s.appcode===code)
 
 /* ORIGINAL INSTALL FUNCTION */
 
-function markInstalled(i){
+async function markInstalled(i){
 
-let subs=getSubs()
+let subs = await getSubs()
 
-subs[i].status=5
+let sub = subs[i]
 
-localStorage.setItem("subs",JSON.stringify(subs))
+if(!sub) return
+
+let code = sub.code || sub.appcode
+
+await db.collection("subscribers").doc(code).update({
+status:5
+})
 
 render()
 
@@ -305,17 +291,11 @@ render()
 
 /* ADDED SAFE INSTALL FUNCTION (code based) */
 
-function markInstalledByCode(code){
+async function markInstalledByCode(code){
 
-let subs=getSubs()
-
-let i=findIndexByCode(code)
-
-if(i===-1) return
-
-subs[i].status=5
-
-localStorage.setItem("subs",JSON.stringify(subs))
+await db.collection("subscribers").doc(code).update({
+status:5
+})
 
 render()
 
@@ -346,9 +326,9 @@ window.open(url,"_blank")
 
 /* ROUTE OPTIMIZATION */
 
-function optimizeRoute(){
+async function optimizeRoute(){
 
-let subs=getSubs()
+let subs = await getSubs()
 
 let coords=[]
 
@@ -379,9 +359,9 @@ window.open(url,"_blank")
 
 /* RENDER JOBS */
 
-function render(){
+async function render(){
 
-let subs=getSubs()
+let subs = await getSubs()
 
 let table=document.getElementById("jobTable")
 
@@ -489,7 +469,7 @@ window.location="index.html"
 
 render()
 
-setInterval(render,2000)
+setInterval(render,4000)
 
 </script>
 

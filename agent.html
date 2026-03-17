@@ -7,6 +7,7 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 <style>
 
@@ -257,23 +258,23 @@ Monthly Earnings<br>
 <script>
 
 const firebaseConfig = {
-  apiKey: "AIzaSyBwrJprjuU4BywFapZyw_SsBcsJAYo5OPU",
-  authDomain: "convergecrm-7c237.firebaseapp.com",
-  projectId: "convergecrm-7c237",
-  storageBucket: "convergecrm-7c237.firebasestorage.app",
-  messagingSenderId: "1078658502451",
-  appId: "1:1078658502451:web:7d81a4d127d42f15eab846"
-};
+apiKey:"AIzaSyBwrJprjuU4BywFapZyw_SsBcsJAYo5OPU",
+authDomain:"convergecrm-7c237.firebaseapp.com",
+projectId:"convergecrm-7c237",
+storageBucket:"convergecrm-7c237.firebasestorage.app",
+messagingSenderId:"1078658502451",
+appId:"1:1078658502451:web:7d81a4d127d42f15eab846"
+}
 
-firebase.initializeApp(firebaseConfig);
+firebase.initializeApp(firebaseConfig)
 
-const auth = firebase.auth();
-const db = firebase.firestore();
+const db=firebase.firestore()
 
 </script>
 
+
 <script>
-    
+
 let chart
 
 function showPage(p){
@@ -285,11 +286,12 @@ document.getElementById(p).style.display="block"
 
 }
 
+
 async function getSubs(){
 
 let subs=[]
 
-const snapshot = await db.collection("subscribers").get()
+const snapshot=await db.collection("subscribers").get()
 
 snapshot.forEach(doc=>{
 subs.push(doc.data())
@@ -298,18 +300,13 @@ subs.push(doc.data())
 return subs
 
 }
-}
-
-/* ensure storage exists */
 
 
-function addSubscriber(){
-
-let subs=getSubs()
+async function addSubscriber(){
 
 let code=document.getElementById("appcode").value
 
-db.collection("subscribers").doc(code).set({
+await db.collection("subscribers").doc(code).set({
 
 name:document.getElementById("name").value,
 address:document.getElementById("address").value,
@@ -323,13 +320,11 @@ agent:localStorage.getItem("agent"),
 status:0
 
 })
-})
-
-localStorage.setItem("subs",JSON.stringify(subs))
 
 render()
 
 }
+
 
 function statusLabel(status){
 
@@ -345,6 +340,7 @@ return ""
 
 }
 
+
 function updateChart(app,pending,inst){
 
 if(chart) chart.destroy()
@@ -357,31 +353,23 @@ data:{
 labels:["Applications","Pending","Installed"],
 datasets:[{
 data:[app,pending,inst],
-backgroundColor:[
-"#7b1fa2",
-"#ff9800",
-"#4caf50"
-]
+backgroundColor:["#7b1fa2","#ff9800","#4caf50"]
 }]
 },
 
 options:{
 plugins:{legend:{display:false}},
-scales:{
-y:{
-beginAtZero:true,
-ticks:{stepSize:1}
-}
-}
+scales:{y:{beginAtZero:true,ticks:{stepSize:1}}}
 }
 
 })
 
 }
 
-function render(){
 
-let subs=getSubs()
+async function render(){
+
+let subs=await getSubs()
 
 let table=document.getElementById("subTable")
 
@@ -394,11 +382,7 @@ let earnings=0
 
 subs.forEach(s=>{
 
-/* ADDED: normalize status sync */
-
-if(s.appcode && !s.code){
-s.code=s.appcode
-}
+if(s.appcode && !s.code){ s.code=s.appcode }
 
 if(s.agent==localStorage.getItem("agent")){
 
@@ -407,10 +391,8 @@ applications++
 if(s.status>=1 && s.status<=3) pending++
 
 if(s.status>=5){
-
 installed++
 earnings+=(s.plan/2)-50
-
 }
 
 table.innerHTML+=`
@@ -445,17 +427,18 @@ updateChart(applications,pending,installed)
 
 }
 
+
 function logout(){
 
 localStorage.removeItem("agent")
-
 window.location="index.html"
 
 }
 
+
 render()
 
-setInterval(render,2000)
+setInterval(render,4000)
 
 </script>
 
