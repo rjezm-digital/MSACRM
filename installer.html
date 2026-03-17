@@ -223,6 +223,23 @@ Optimize Route
 
 <script>
 
+const firebaseConfig = {
+apiKey:"AIzaSyBwrJprjuU4BywFapZyw_SsBcsJAYo5OPU",
+authDomain:"convergecrm-7c237.firebaseapp.com",
+projectId:"convergecrm-7c237",
+storageBucket:"convergecrm-7c237.firebasestorage.app",
+messagingSenderId:"1078658502451",
+appId:"1:1078658502451:web:7d81a4d127d42f15eab846"
+}
+
+firebase.initializeApp(firebaseConfig)
+
+const db=firebase.firestore()
+
+</script>
+
+<script>
+
 /* INSTALLER TEAM */
 
 let team = localStorage.getItem("installerTeam")
