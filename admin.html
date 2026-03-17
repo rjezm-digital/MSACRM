@@ -350,7 +350,7 @@ if(p==="mapview") setTimeout(loadMap,300)
 
 }
 
-let subs = await getSubs(){
+async function getSubs(){
 
 let subs=[]
 
@@ -503,18 +503,13 @@ updateMap()
 
 }
 
-async function renderAgentTable(){
+async function updateMap(){
+
+if(!cluster) return
+
+cluster.clearLayers()
 
 let subs = await getSubs()
-let html=""
-let topAgent=""
-let topCommission=0
-
-Object.keys(agents).forEach(agent=>{
-
-let applications=0
-let installed=0
-let commission=0
 
 subs.forEach(s=>{
 
@@ -559,7 +554,7 @@ document.getElementById("topAgent").innerHTML=
 
 }
 
-async function renderTables(){
+async function renderAgentTable(agents){
 
 let subs = await getSubs()
 
@@ -736,11 +731,15 @@ updateMap()
 
 function updateMap(){
 
+async function updateMap(){
+
 if(!cluster) return
 
 cluster.clearLayers()
 
-getSubs().forEach(s=>{
+let subs = await getSubs()
+
+subs.forEach(s=>{
 
 if(s.lat && s.long){
 
