@@ -376,7 +376,7 @@ return subs.findIndex(s=>s.code===code)
 
 async function setStatus(code,val){
 let subs = await getSubs()
-let i=findSub(code)
+let i = await findSub(code)
 
 if(i===-1) return
 
@@ -390,7 +390,7 @@ render()
 
 async function saveInstaller(code){
 let subs = await getSubs()
-let i=findSub(code)
+let i = await findSub(code)
 
 subs[i].installer=document.getElementById("installer_"+code).value
 subs[i].installationDate=document.getElementById("date_"+code).value
@@ -404,7 +404,7 @@ render()
 
 async function changeTeam(code){
 let subs = await getSubs()
-let i=findSub(code)
+let i = await findSub(code)
 
 subs[i].installerLocked=false
 
@@ -416,7 +416,7 @@ render()
 
 async function installerDone(code){
 let subs = await getSubs()
-let i=findSub(code)
+let i = await findSub(code)
 
 subs[i].status=STATUS.INSTALL_DONE
 
@@ -428,7 +428,7 @@ render()
 
 async function confirmInstall(code){
 let subs = await getSubs()
-let i=findSub(code)
+let i = await findSub(code)
 
 subs[i].status=STATUS.INSTALLED
 subs[i].installedDate=new Date().toISOString()
@@ -495,38 +495,6 @@ renderAgentTable(agents)
 renderTables()
 
 /* ADDED: ensure map always updates */
-updateMap()
-
-}
-
-async function updateMap(){
-
-if(!cluster) return
-
-cluster.clearLayers()
-
-let subs = await getSubs()
-
-subs.forEach(s=>{
-
-if(s.agent==agent){
-
-applications++
-
-if(s.status>=STATUS.INSTALL_DONE){
-
-installed++
-commission+=(s.plan/2)-50
-
-if(commission>topCommission){
-topCommission=commission
-topAgent=agent
-}
-}
-
-}
-
-})
 
 html+=`
 <tr>
