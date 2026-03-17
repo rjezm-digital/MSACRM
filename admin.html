@@ -322,7 +322,7 @@ const db = firebase.firestore();
 
 </script>
 
-<<script>
+<script>
 
 const STATUS={
 ENCODED:0,
@@ -357,8 +357,12 @@ let subs=[]
 const snapshot = await db.collection("subscribers").get()
 
 snapshot.forEach(doc=>{
-subs.push(doc.data())
+subs.push({code:doc.id, ...doc.data()})
 })
+
+return subs
+
+}
 
 return subs
 
