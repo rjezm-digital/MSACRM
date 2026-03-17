@@ -505,7 +505,7 @@ updateMap()
 
 async function renderAgentTable(){
 
-let subs=getSubs()
+let subs = await getSubs()
 let html=""
 let topAgent=""
 let topCommission=0
@@ -561,7 +561,7 @@ document.getElementById("topAgent").innerHTML=
 
 async function renderTables(){
 
-let subs=getSubs()
+let subs = await getSubs()
 
 let table=""
 let schedule=""
